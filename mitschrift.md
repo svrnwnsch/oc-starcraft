@@ -16,6 +16,16 @@ Initiale besprechung am 17.05.2017
 * Mögliche Probleme:
 ** Terrain abbilden (es kann nicht überall hin gelaufen werden wasser etc) Fliegende einheiten können aber über wasser
 
+
+Actions
+--------
+* Pause
+* Move in Direction (8?)
+* Move to closest Enemy/Allie (of type...)
+* Shoot at Enemy of type X with lowest health/ closest position
+* Use special abilities
+
+
 Rewards
 --------
 * Multistep Rewards
@@ -42,4 +52,5 @@ Rewards
 * -2000 Rewards
 ** Werde zerstört
 * Verlier Spiel -5000
+
 

@@ -1,4 +1,4 @@
-%\documentclass[handout]{beamer}
+%\documentclass[•]{•}ss[handout]{beamer}
 \documentclass[ignorenonframetext]{beamer}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
@@ -60,9 +60,10 @@
 
 
 %------------------------------------------------------------------------------------
-\title[Kolloquium]{Development of an Extendible Quality Assurance System for Automated BIOS Testing}
-\author[Manuel Milling]{\large{Manuel Milling} \\
-\tiny{14.10.2015} }
+\title[Team XCS Presentation]{Team 17: eXtreme Coding Starcraft}
+\subtitle[]{Design of the XCS-based Starcraft Bot}
+\author[Milling, Petzak, Wünsch]{\large{Manuel Milling, Tobias Petzak, Severin Wünsch} \\
+\tiny{\today} }
 \institute[University of Augsburg]{Faculty of Applied Computer Science, University of Augsburg} 
 
 \date[14. October 2015]
@@ -93,7 +94,7 @@
 \setbeamertemplate{footline}
 {
   \leavevmode%
-  \hbox{%
+  \hbox{%http://www.drk-blutspende.de/blutspendetermine/detail.php?id=6280
   \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
     \usebeamerfont{author in head/foot}\insertshortauthor~~\beamer@ifempty{\insertshortinstitute}{}{}
   \end{beamercolorbox}%
@@ -107,13 +108,102 @@
 \frame[plain]{\titlepage}
 \frame{\tableofcontents}
 
-\section{Motivation}
+\section{Overview}
 \begin{frame}
-\frametitle{Motivation}
+\frametitle{Overview}
+\begin{itemize}
+\item Multi-Step Reward
+\item Different XCS for each type of unit (shared between units of same type).
+\item start simple $\rightarrow$ upgrade gradually.
+\end{itemize}
 \end{frame}
 
+\section{State Space}
 
+\begin{frame}
+\frametitle{State Space}
+\begin{itemize}
+\item Absolute Position of operating unit
+\item Relative Positions of $k/l$ many closest Enemies/Allies including their health, type, status etc.
+\begin{itemize}
+\item Use Polar Coordinates
+\item Sectors can overlap
+\end{itemize}
+\item Total Number of Allies and Enemies in Sight.
+\item Total Killcount
+\end{itemize}
+\end{frame}
 
+\section{Actions}
+
+\begin{frame}
+\frametitle{Actions}
+\begin{itemize}
+\item Pause
+\item Move in Direction (8?)
+\item Move to closest Enemy/Allie (of type...)
+\item Shoot at Enemy of type X with lowest health/ closest position
+\item Use special abilities
+\end{itemize}
+\end{frame}
+
+\section{Rewards}
+
+\begin{frame}
+\frametitle{Rewards (positive)}
+\begin{itemize}
+\item Category 1
+	\begin{itemize}
+	\item Move to possible direction
+	\end{itemize}
+\item Category 2
+	\begin{itemize}
+	\item Find Enemy Unit
+	\end{itemize}
+\item Category 3
+	\begin{itemize}
+	\item Deal Damage to Enemy Unit (Reward proportional to Damage)
+	\item Heal Allied Unit (Reward proportional to Healing)
+	\end{itemize}
+\item Category 4
+	\begin{itemize}
+	\item Kill Enemy Unit
+	\end{itemize}
+\item Category 5
+	\begin{itemize}
+	\item Win Game
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Rewards (negative)}
+\begin{itemize}
+\item Category 1
+	\begin{itemize}
+	\item Go to unreachable Point (Water, Edge of the Map)
+	\item Lose Mana (Reward proportional to Mana Loss)	
+	\end{itemize}
+\item Category 2
+	\begin{itemize}
+	\item Get Detected by Enemy Unit
+	\end{itemize}
+\item Category 3
+	\begin{itemize}
+	\item Get Damage (Reward proportional to Damage Dealt)
+	\item Not able to use Special Ability (Mana)
+	\end{itemize}
+\item Category 4
+	\begin{itemize}
+	\item Get Killed
+	\end{itemize}
+\item Category 5
+	\begin{itemize}
+	\item Lose Game
+	\end{itemize}
+
+\end{itemize}
+\end{frame}
 
 \end{document}
 
