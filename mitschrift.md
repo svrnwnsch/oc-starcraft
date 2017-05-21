@@ -15,7 +15,7 @@ Initiale besprechung am 17.05.2017
 
 * Mögliche Probleme:
 ** Terrain abbilden (es kann nicht überall hin gelaufen werden wasser etc) Fliegende einheiten können aber über wasser
-	=> Es gibt eine Erweiterung der API, welche die gesamte Karte scannt https://bitbucket.org/auriarte/bwta2
+** => Es gibt eine Erweiterung der API, welche die gesamte Karte scannt https://bitbucket.org/auriarte/bwta2
 
 Actions
 --------
