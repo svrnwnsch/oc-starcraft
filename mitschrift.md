@@ -53,4 +53,8 @@ Rewards
 ** Werde zerstört
 * Verlier Spiel -5000
 
+Vortrag Ideen
+-------------
+* Voitures können Minen legen, die Anzahl der minenen als Input verwenden. Reward findet deutlich später statt (wenn überhaupt). Taktik: Minen um Base legen oder engstellen der map. Time delayed reward?
+* Kein Feedback von Tutoren, scheint alles zu passen.
 
