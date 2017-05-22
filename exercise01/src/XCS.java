@@ -11,6 +11,7 @@ public class XCS {
     private HashSet<Condition> population; // population of all classifiers in XCS
     private HashSet<Condition> matchSet; // match set for current environment
     private HashSet<Condition> actionSet; // action set of all classifiers
+    private HashSet<Condition> lastActionSet; // action set of last action for delayed reward
 
     // XCS parameters taken from "An Algorithmic Description of XCS"
 
