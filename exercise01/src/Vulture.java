@@ -20,7 +20,7 @@ public class Vulture {
          */
         Unit target = getClosestEnemy();
         move(target);
-	    attackClosestEnemy(target);
+        attackClosestEnemy(target);
     }
 
     private void move(Unit target) {
@@ -45,9 +45,9 @@ public class Vulture {
         return this.unit.getPosition().getDistance(enemy.getPosition());
     }
 
-    private void attackClosestEnemy(Unit closestEnemy){
-	    if(unit.canAttack(closestEnemy)==true){
-			unit.attack(closestEnemy);
-	}
+    private void attackClosestEnemy(Unit closestEnemy) {
+        if (unit.canAttack(closestEnemy) == true) {
+            unit.attack(closestEnemy);
+        }
     }
 }
