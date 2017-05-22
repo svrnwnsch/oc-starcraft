@@ -6,21 +6,21 @@ import java.util.*;
  */
 public class Condition {
 
-    public int alliesArraySize = 5;
-    public int enemiesArraySize = 5;
-    public int maxUnits = 50;
-    public int maxPosX = 1000;
-    public int maxPosY = 1000;
+    public static final int alliesArraySize = 5;
+    public static final int enemiesArraySize = 5;
+    public static final int maxUnits = 50;
+    public static final int maxPosX = 1000;
+    public static final int maxPosY = 1000;
 
 
-    private double posX;
-    private double posY;
+    private double unitPosX;
+    private double unitPosY;
 
     
 
-    public Condition(){
+    public Condition(Unit unit){
         int numberAlliesInSight = getNumberAlliesInSight();
-        int numberEnemiesInSight = getNumberEnemiesInSight();
+        int numberEnemiesOnMap = getNumberEnemiesInSight();
         int killCountEnemies = getKillCountEnemies();
         int killCountAllies = getKillCountAllies();
 
