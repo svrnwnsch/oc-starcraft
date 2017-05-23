@@ -11,8 +11,9 @@ public abstract class MoveAction implements Action {
     private int moveRadius = 20;
     Game game;
 
-    public MoveAction(Game game) {
+    public MoveAction(Game game, Double moveAngle) {
         this.game = game;
+        this.moveAngle = moveAngle;
     }
 
 
@@ -40,5 +41,22 @@ public abstract class MoveAction implements Action {
 
     public void setMoveAngle(double moveAngle) {
         this.moveAngle = moveAngle;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) return false;
+        if (other == this) return true;
+        if (!(other instanceof MoveAction)) return false;
+        MoveAction otherMoveAction = (MoveAction) other;
+        return moveAngle == otherMoveAction.getMoveAngle() && moveRadius == otherMoveAction.getMoveRadius();
+    }
+
+    public int getMoveRadius() {
+        return moveRadius;
+    }
+
+    public double getMoveAngle() {
+        return moveAngle;
     }
 }
