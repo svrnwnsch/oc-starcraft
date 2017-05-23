@@ -18,19 +18,22 @@ public class Situation {
     public static final double maxDistance = Math.sqrt(maxPosX*maxPosX + maxPosY*maxPosY);
 
 
-    private double numberAlliesOnMap;
+    private double unitHitPoints;
+    private double unitPosX;
+    private double unitPosY;
+
+    private final double numberAlliesOnMap;
     private double numberEnemiesOnMap;
     private double numberSightedEnemiesOnMap;
     private double killCountEnemies;
     private double killCountAllies;
 
-    private double unitHitPoints;
-    private double unitPosX;
-    private double unitPosY;
     private HashSet<Unit> enemiesOnMap = new HashSet<Unit>();
     private HashSet<Unit> alliesOnMap = new HashSet<Unit>();
     private ArrayList<Unit> closestEnemies;
     private ArrayList<Unit> closestAllies;
+
+
 
 
 
