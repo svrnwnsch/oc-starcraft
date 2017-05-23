@@ -1,9 +1,13 @@
 import bwapi.*;
-import java.util.*;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class VultureAI  extends DefaultBWListener implements Runnable {
+
+    private final static Logger LOGGER = Logger.getLogger(VultureAI.class.getName());
 
     private final Mirror bwapi;
     private Game game;
@@ -14,12 +18,12 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     private HashSet<Unit> alliedUnits = new HashSet<Unit>();
 
     public VultureAI() {
-        System.out.println("This is the VultureAI! :)");
+        LOGGER.setLevel(Level.CONFIG);
+        LOGGER.info("This is the VultureAI! :)");
         this.bwapi = new Mirror();
     }
 
     public static void main(String[] args) {
-
         new VultureAI().run();
     }
 
@@ -41,23 +45,23 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     @Override
     public void onFrame() {
 
-        //System.out.println("blabla");
+        //LOGGER.info("blabla");
         vulture.step();
         if (frame % 100 == 0) {
             List<Unit> allUnits = game.getAllUnits();
-            //System.out.println("size of all Units:" + allUnits.size());
+            //LOGGER.info("size of all Units:" + allUnits.size());
             for(Unit unit : allUnits){
-                //System.out.println("size of all Units:" + allUnits.size());
-                //System.out.println(unit);
+                //LOGGER.info("size of all Units:" + allUnits.size());
+                //LOGGER.info(unit);
 
-                //System.out.println(unit.getPlayer());
+                //LOGGER.info(unit.getPlayer());
                 if(unit.getPlayer() == this.self){
-                    //System.out.println("Unit is the from player" + unit.getPlayer());
+                    //LOGGER.info("Unit is the from player" + unit.getPlayer());
                     alliedUnits.add(unit);
                     Situation situation = new Situation(unit, game);
                     HashSet<Unit> enemyUnits = situation.getEnemiesOnMap();
-                    System.out.println("Enemy Units:" + situation.getNumberSightedEnemiesOnMap());
-                    System.out.println("Allied Units:" + situation.getNumberAlliesOnMap());
+                    LOGGER.info("Enemy Units:" + situation.getNumberSightedEnemiesOnMap());
+                    LOGGER.info("Allied Units:" + situation.getNumberAlliesOnMap());
 
                 }
             }
@@ -68,7 +72,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
 
     @Override
     public void onUnitCreate(Unit unit) {
-        System.out.println("New unit discovered " + unit.getType());
+        LOGGER.info("New unit discovered " + unit.getType());
         UnitType type = unit.getType();
 
         if (type == UnitType.Terran_Vulture) {
