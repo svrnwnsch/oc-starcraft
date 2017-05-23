@@ -2,6 +2,7 @@ import bwapi.*;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,6 +20,13 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
 
     public VultureAI() {
         LOGGER.setLevel(Level.CONFIG);
+
+        // Code so that console shows all logger events down to finer
+        ConsoleHandler handler = new ConsoleHandler();
+        // PUBLISH this level
+        handler.setLevel(Level.FINER);
+        LOGGER.addHandler(handler);
+
         LOGGER.info("This is the VultureAI! :)");
         this.bwapi = new Mirror();
     }
