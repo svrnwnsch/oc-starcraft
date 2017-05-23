@@ -10,28 +10,29 @@ import java.util.ArrayList;
  */
 public class Situation {
 
-    public static final int closestAlliesArraySize = 5;
-    public static final int closestEnemiesArraySize = 5;
+    public static final int closestAlliesArraySize = 3;
+    public static final int closestEnemiesArraySize = 3;
     public static final int maxUnits = 50;
-    public static final int maxPosX = 10000;
-    public static final int maxPosY = 10000;
+    //manually determined for current map(Karte-Aufgabe4_v1.scx)
+    public static final int maxPosX = 5000;
+    public static final int maxPosY = 4000;
+    public static final int maxGroundCooldown = 100;
     public static final double maxDistance = Math.sqrt(maxPosX*maxPosX + maxPosY*maxPosY);
 
 
     private double unitHitPoints;
     private double unitPosX;
     private double unitPosY;
+    private double unitGroundCooldown;
 
-    private final double numberAlliesOnMap;
+    private double numberAlliesOnMap;
     private double numberEnemiesOnMap;
     private double numberSightedEnemiesOnMap;
     private double killCountEnemies;
     private double killCountAllies;
 
-    private HashSet<Unit> enemiesOnMap = new HashSet<Unit>();
-    private HashSet<Unit> alliesOnMap = new HashSet<Unit>();
-    private ArrayList<Unit> closestEnemies;
-    private ArrayList<Unit> closestAllies;
+    private ArrayList<ReducedUnit> closestEnemies;
+    private ArrayList<ReducedUnit> closestAllies;
 
 
 
@@ -42,13 +43,16 @@ public class Situation {
         unitPosX = ConditionUtil.parseValue(unit.getX(), maxPosX);
         unitPosY = ConditionUtil.parseValue(unit.getY(), maxPosY);
         unitHitPoints = ConditionUtil.parseValue(unit.getHitPoints(), unit.getType().maxHitPoints());
+        unitGroundCooldown = ConditionUtil.parseValue(unit.getGroundWeaponCooldown(), maxGroundCooldown);
+
         List<Unit> allUnits = game.getAllUnits();
         //Separating enemy units from allied units
+        HashSet<Unit> enemiesOnMap = new HashSet<Unit>();
+        HashSet<Unit> alliesOnMap = new HashSet<Unit>();
         for(Unit currentUnit : allUnits){
             if(currentUnit.getPlayer() != game.self()){
                 enemiesOnMap.add(currentUnit);
-            }
-            else{
+            } else if (!currentUnit.equals(unit)) {
                 alliesOnMap.add(currentUnit);
             }
         }
@@ -64,9 +68,9 @@ public class Situation {
     }
 
     //Getting number many closest units to mainUnit sorted as an ArrayList. Sorting may be optimized
-    public ArrayList<Unit> getClosestUnits(int number, HashSet<Unit> units, Unit mainUnit){
+    public ArrayList<ReducedUnit> getClosestUnits(int number, HashSet<Unit> units, Unit mainUnit) {
         //Length of the ArrayList is final. Empty entries possible
-        ArrayList<Unit> closestUnits = new ArrayList<Unit>(number);
+        ArrayList<ReducedUnit> closestUnits = new ArrayList<ReducedUnit>(number);
         //cloning source set
         HashSet<Unit> workSetUnits = (HashSet<Unit>) units.clone();
         //sorting algorithm
@@ -83,21 +87,26 @@ public class Situation {
                     closestUnit = unit;
                 }
             }
-            closestUnits.add(i , closestUnit);
+
+            closestUnits.add(i, new ReducedUnit(closestUnit, mainUnit.getPosition()));
             workSetUnits.remove(closestUnit);
         }
-
 
         return closestUnits;
     }
 
-    public HashSet<Unit> getAlliesOnMap() {
-        return alliesOnMap;
+    public double getUnitGroundCooldown() {
+        return unitGroundCooldown;
     }
 
-    public HashSet<Unit> getEnemiesOnMap() {
-        return enemiesOnMap;
+    public ArrayList<ReducedUnit> getClosestAllies() {
+        return closestAllies;
     }
+
+    public ArrayList<ReducedUnit> getClosestEnemies() {
+        return closestEnemies;
+    }
+
 
     public double getNumberSightedEnemiesOnMap(){ return numberSightedEnemiesOnMap;}
 
