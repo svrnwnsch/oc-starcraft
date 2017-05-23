@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 public class ConditionUtil {
     //public static String bla = "bla";
 
-    public static double parseValue(double actualValue, double maxValue){
-        return actualValue/maxValue;
+    public static double parseValue(int actualValue, int maxValue){
+        return ((double) actualValue)/((double) maxValue);
 }
 
 //public Condition(String regex) {

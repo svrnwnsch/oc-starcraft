@@ -1,3 +1,4 @@
+import bwapi.Game;
 import bwapi.Unit;
 
 import java.util.ArrayList;
@@ -10,50 +11,68 @@ public class Situation {
     public static final int alliesArraySize = 5;
     public static final int enemiesArraySize = 5;
     public static final int maxUnits = 50;
-    public static final int maxPosX = 1000;
-    public static final int maxPosY = 1000;
+    public static final int maxPosX = 10000;
+    public static final int maxPosY = 10000;
 
 
+    private double numberAlliesOnMap;
+    private double numberEnemiesOnMap;
+    private double killCountEnemies;
+    private double killCountAllies;
+
+    private double unitHitPoints;
     private double unitPosX;
     private double unitPosY;
+    private ArrayList<Unit> enemiesInSight;
+    private ArrayList<Unit> alliesInSight;
 
 
 
-    public Situation(Unit unit){
-        int numberAlliesInSight = getNumberAlliesInSight();
-        int numberEnemiesOnMap = getNumberEnemiesInSight();
-        int killCountEnemies = getKillCountEnemies();
-        int killCountAllies = getKillCountAllies();
+    public Situation(Unit unit, Game game){
+        unitPosX = ConditionUtil.parseValue(unit.getX(), maxPosX);
+        unitPosY = ConditionUtil.parseValue(unit.getY(), maxPosY);
+        unitHitPoints = ConditionUtil.parseValue(unit.getHitPoints(), unit.getType().maxHitPoints());
 
-        ArrayList<Unit> enemiesInSight = new ArrayList<Unit>();
-        enemiesInSight = getEnemiesInSight();
-        ArrayList<Unit> alliesInSight = new ArrayList<Unit>();
-        alliesInSight = getAlliesInSight();
+        //numberAlliesOnMap = getNumberAlliesInSight();
+        //numberEnemiesOnMap = getNumberEnemiesInSight();
+        //killCountEnemies = getKillCountEnemies();
+        //killCountAllies = getKillCountAllies();
+
+        //enemiesInSight = new ArrayList<Unit>();
+        //enemiesInSight = getEnemiesInSight();
+        //alliesInSight = new ArrayList<Unit>();
+        //alliesInSight = getAlliesInSight();
     }
 
-    private ArrayList<Unit> getAlliesInSight() {
-        return null;
+    public ArrayList<Unit> getAlliesInSight() {
+        return alliesInSight;
     }
 
-    private ArrayList<Unit> getEnemiesInSight() {
-        return null;
+    public ArrayList<Unit> getEnemiesInSight() {
+        return enemiesInSight;
     }
 
-    private int getKillCountAllies() {
+    public double getKillCountAllies() {
+        return killCountAllies;
+    }
+
+    public double getKillCountEnemies() {
+        return killCountEnemies;
+    }
+
+    public double getNumberEnemiesInSight() {
         return 0;
     }
 
-    private int getKillCountEnemies() {
+    public double getNumberAlliesInSight() {
         return 0;
     }
 
-    private int getNumberEnemiesInSight() {
-        return 0;
-    }
+    public double getUnitPosX(){return unitPosX;}
 
-    private int getNumberAlliesInSight() {
-        return 0;
-    }
+    public double getUnitPosY(){return unitPosY;}
+
+    public double getUnitHitpoints(){return unitHitPoints;}
     //private Pattern conditionPattern;
 
     //public Condition(String regex) {
