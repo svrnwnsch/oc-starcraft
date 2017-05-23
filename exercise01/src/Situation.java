@@ -1,6 +1,8 @@
 import bwapi.Game;
 import bwapi.Unit;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.ArrayList;
 
 /**
@@ -23,15 +25,23 @@ public class Situation {
     private double unitHitPoints;
     private double unitPosX;
     private double unitPosY;
-    private ArrayList<Unit> enemiesInSight;
-    private ArrayList<Unit> alliesInSight;
+    private HashSet<Unit> enemiesInSight = new HashSet<Unit>();
+    private HashSet<Unit> alliesInSight = new HashSet<Unit>();
 
 
 
     public Situation(Unit unit, Game game){
+        //System.out.println("new Situation created");
         unitPosX = ConditionUtil.parseValue(unit.getX(), maxPosX);
         unitPosY = ConditionUtil.parseValue(unit.getY(), maxPosY);
         unitHitPoints = ConditionUtil.parseValue(unit.getHitPoints(), unit.getType().maxHitPoints());
+        List<Unit> allUnits = game.getAllUnits();
+        for(Unit objectUnit : allUnits){
+            if(objectUnit.getPlayer() != game.self()){
+                enemiesInSight.add(objectUnit);
+                System.out.println("Added Eneemy Unit in Situation Constr");
+            }
+        }
 
         //numberAlliesOnMap = getNumberAlliesInSight();
         //numberEnemiesOnMap = getNumberEnemiesInSight();
@@ -44,11 +54,11 @@ public class Situation {
         //alliesInSight = getAlliesInSight();
     }
 
-    public ArrayList<Unit> getAlliesInSight() {
+    public HashSet<Unit> getAlliesInSight() {
         return alliesInSight;
     }
 
-    public ArrayList<Unit> getEnemiesInSight() {
+    public HashSet<Unit> getEnemiesInSight() {
         return enemiesInSight;
     }
 
