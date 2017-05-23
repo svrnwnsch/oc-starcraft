@@ -1,4 +1,5 @@
 import bwapi.*;
+import java.util.*;
 
 import java.util.HashSet;
 
@@ -10,6 +11,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     private Vulture vulture;
     private HashSet<Unit> enemyUnits;
     private int frame;
+    private HashSet<Unit> alliedUnits = new HashSet<Unit>();
 
     public VultureAI() {
         System.out.println("This is the VultureAI! :)");
@@ -17,6 +19,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     }
 
     public static void main(String[] args) {
+
         new VultureAI().run();
     }
 
@@ -38,10 +41,27 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     @Override
     public void onFrame() {
 
+        //System.out.println("blabla");
         vulture.step();
+        if (frame % 100 == 0) {
+            List<Unit> allUnits = game.getAllUnits();
+            //System.out.println("size of all Units:" + allUnits.size());
+            for(Unit unit : allUnits){
+                //System.out.println("size of all Units:" + allUnits.size());
+                //System.out.println(unit);
 
-        if (frame % 1000 == 0) {
-            System.out.println("Frame: " + frame);
+                //System.out.println(unit.getPlayer());
+                if(unit.getPlayer() == this.self){
+                    //System.out.println("Unit is the from player" + unit.getPlayer());
+                    alliedUnits.add(unit);
+                    Situation situation = new Situation(unit, game);
+                    HashSet<Unit> enemyUnits = situation.getEnemiesOnMap();
+                    System.out.println("Enemy Units:" + situation.getNumberSightedEnemiesOnMap());
+                    System.out.println("Allied Units:" + situation.getNumberAlliesOnMap());
+
+                }
+            }
+
         }
         frame++;
     }
