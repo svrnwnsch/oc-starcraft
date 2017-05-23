@@ -19,14 +19,15 @@ public class Situation {
 
     private double numberAlliesOnMap;
     private double numberEnemiesOnMap;
+    private double numberSightedEnemiesOnMap;
     private double killCountEnemies;
     private double killCountAllies;
 
     private double unitHitPoints;
     private double unitPosX;
     private double unitPosY;
-    private HashSet<Unit> enemiesInSight = new HashSet<Unit>();
-    private HashSet<Unit> alliesInSight = new HashSet<Unit>();
+    private HashSet<Unit> enemiesOnMap = new HashSet<Unit>();
+    private HashSet<Unit> alliesOnMap = new HashSet<Unit>();
 
 
 
@@ -36,12 +37,17 @@ public class Situation {
         unitPosY = ConditionUtil.parseValue(unit.getY(), maxPosY);
         unitHitPoints = ConditionUtil.parseValue(unit.getHitPoints(), unit.getType().maxHitPoints());
         List<Unit> allUnits = game.getAllUnits();
-        for(Unit objectUnit : allUnits){
-            if(objectUnit.getPlayer() != game.self()){
-                enemiesInSight.add(objectUnit);
-                System.out.println("Added Eneemy Unit in Situation Constr");
+        for(Unit currentUnit : allUnits){
+            if(currentUnit.getPlayer() != game.self()){
+                enemiesOnMap.add(currentUnit);
+                //System.out.println("Added Eneemy Unit in Situation Constr");
+            }
+            else{
+                alliesOnMap.add(currentUnit);
             }
         }
+        numberAlliesOnMap = ConditionUtil.parseValue(alliesOnMap.size(), maxUnits);
+        numberSightedEnemiesOnMap = ConditionUtil.parseValue(enemiesOnMap.size(), maxUnits);
 
         //numberAlliesOnMap = getNumberAlliesInSight();
         //numberEnemiesOnMap = getNumberEnemiesInSight();
@@ -54,13 +60,15 @@ public class Situation {
         //alliesInSight = getAlliesInSight();
     }
 
-    public HashSet<Unit> getAlliesInSight() {
-        return alliesInSight;
+    public HashSet<Unit> getAlliesOnMap() {
+        return alliesOnMap;
     }
 
-    public HashSet<Unit> getEnemiesInSight() {
-        return enemiesInSight;
+    public HashSet<Unit> getEnemiesOnMap() {
+        return enemiesOnMap;
     }
+
+    public double getNumberSightedEnemiesOnMap(){ return numberSightedEnemiesOnMap;}
 
     public double getKillCountAllies() {
         return killCountAllies;
@@ -70,12 +78,12 @@ public class Situation {
         return killCountEnemies;
     }
 
-    public double getNumberEnemiesInSight() {
-        return 0;
+    public double getNumberEnemiesOnMap() {
+        return numberEnemiesOnMap;
     }
 
-    public double getNumberAlliesInSight() {
-        return 0;
+    public double getNumberAlliesOnMap() {
+        return numberAlliesOnMap;
     }
 
     public double getUnitPosX(){return unitPosX;}
@@ -83,6 +91,8 @@ public class Situation {
     public double getUnitPosY(){return unitPosY;}
 
     public double getUnitHitpoints(){return unitHitPoints;}
+
+
     //private Pattern conditionPattern;
 
     //public Condition(String regex) {
