@@ -17,7 +17,7 @@ public class Situation {
     public static final int maxPosX = 5000;
     public static final int maxPosY = 4000;
     public static final int maxGroundCooldown = 100;
-    public static final double maxDistance = Math.sqrt(maxPosX*maxPosX + maxPosY*maxPosY);
+    public static final double maxDistance = Math.sqrt(maxPosX * maxPosX + maxPosY * maxPosY);
 
 
     private double unitHitPoints;
@@ -35,10 +35,7 @@ public class Situation {
     private ArrayList<ReducedUnit> closestAllies;
 
 
-
-
-
-    public Situation(Unit unit, Game game){
+    public Situation(Unit unit, Game game) {
         //Values are always parsed on [0.,1.]
         unitPosX = ConditionUtil.parseValue(unit.getX(), maxPosX);
         unitPosY = ConditionUtil.parseValue(unit.getY(), maxPosY);
@@ -49,15 +46,15 @@ public class Situation {
         //Separating enemy units from allied units
         HashSet<Unit> enemiesOnMap = new HashSet<Unit>();
         HashSet<Unit> alliesOnMap = new HashSet<Unit>();
-        for(Unit currentUnit : allUnits){
-            if(currentUnit.getPlayer() != game.self()){
+        for (Unit currentUnit : allUnits) {
+            if (currentUnit.getPlayer() != game.self()) {
                 enemiesOnMap.add(currentUnit);
             } else if (!currentUnit.equals(unit)) {
                 alliesOnMap.add(currentUnit);
             }
         }
         //Determining the closest Enemies and Alies
-        closestEnemies = getClosestUnits(closestEnemiesArraySize ,enemiesOnMap, unit);
+        closestEnemies = getClosestUnits(closestEnemiesArraySize, enemiesOnMap, unit);
         closestAllies = getClosestUnits(closestAlliesArraySize, alliesOnMap, unit);
 
 
@@ -74,22 +71,25 @@ public class Situation {
         //cloning source set
         HashSet<Unit> workSetUnits = (HashSet<Unit>) units.clone();
         //sorting algorithm
-        for(int i=0; i < number; i++){
+        for (int i = 0; i < number; i++) {
             //if original length of workset is smaller than i
-            if(workSetUnits.isEmpty())
-                return closestUnits;
-            double minimalDistance = 1.;
-            Unit closestUnit = null;
-            for(Unit unit : workSetUnits){
-                double distance = ((double) unit.getPosition().getDistance(mainUnit.getPosition()))/maxDistance;
-                if(distance < minimalDistance){
-                    minimalDistance = distance;
-                    closestUnit = unit;
+            if (workSetUnits.isEmpty())
+                closestUnits.add(i, new ReducedUnit());
+            else {
+                double minimalDistance = 1.;
+                Unit closestUnit = null;
+                for (Unit unit : workSetUnits) {
+                    double distance = ((double) unit.getPosition().getDistance(mainUnit.getPosition())) / maxDistance;
+                    if (distance < minimalDistance) {
+                        minimalDistance = distance;
+                        closestUnit = unit;
+                    }
                 }
+                closestUnits.add(i, new ReducedUnit(closestUnit, mainUnit.getPosition()));
+                workSetUnits.remove(closestUnit);
             }
 
-            closestUnits.add(i, new ReducedUnit(closestUnit, mainUnit.getPosition()));
-            workSetUnits.remove(closestUnit);
+
         }
 
         return closestUnits;
@@ -108,7 +108,9 @@ public class Situation {
     }
 
 
-    public double getNumberSightedEnemiesOnMap(){ return numberSightedEnemiesOnMap;}
+    public double getNumberSightedEnemiesOnMap() {
+        return numberSightedEnemiesOnMap;
+    }
 
     public double getKillCountAllies() {
         return killCountAllies;
@@ -126,17 +128,23 @@ public class Situation {
         return numberAlliesOnMap;
     }
 
-    public double getUnitPosX(){return unitPosX;}
+    public double getUnitPosX() {
+        return unitPosX;
+    }
 
-    public double getUnitPosY(){return unitPosY;}
+    public double getUnitPosY() {
+        return unitPosY;
+    }
 
-    public double getUnitHitpoints(){return unitHitPoints;}
+    public double getUnitHitpoints() {
+        return unitHitPoints;
+    }
 
 
     //private Pattern conditionPattern;
 
     //public Condition(String regex) {
-      //  conditionPattern = Pattern.compile(regex);
+    //  conditionPattern = Pattern.compile(regex);
     //}
 
     //public boolean matches(String environment) {
