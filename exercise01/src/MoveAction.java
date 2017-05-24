@@ -1,4 +1,7 @@
-import bwapi.*;
+import bwapi.Game;
+import bwapi.Position;
+import bwapi.Region;
+import bwapi.Unit;
 
 
 /**
@@ -18,7 +21,7 @@ public abstract class MoveAction implements Action {
 
 
     @Override
-    public double executeAction(Unit executingUnit, Unitset friendlyUnits, Unitset enemyUnits) {
+    public double executeAction(Unit executingUnit) {
         if (!executingUnit.canMove()) {
             return Rewards.ILLEGAL_MOVE;
         }
