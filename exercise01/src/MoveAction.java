@@ -7,14 +7,14 @@ import bwapi.Unit;
 /**
  * Created by OC2 on 23.05.2017.
  */
-public abstract class MoveAction implements Action {
+public class MoveAction implements Action {
 
     // moveAngle should be in Radians
     private double moveAngle;
     private int moveRadius = 20;
     Game game;
 
-    public MoveAction(Game game, Double moveAngle) {
+    public MoveAction(Game game, double moveAngle) {
         this.game = game;
         this.moveAngle = moveAngle;
     }
