@@ -9,4 +9,8 @@ public class Rewards {
 
     // Negative Rewards
     public static int ILLEGAL_MOVE = -1;
+    public static int CANNOT_ATTACK = -10;
+
+    // Multiplier used to config rewards
+    public static int ATTACK_REWARD_MULTIPLIER = 2;
 }
