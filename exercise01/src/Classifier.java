@@ -5,6 +5,8 @@ public class Classifier {
     private Condition condition;
     private int actionId;
     private double prediction;
+
+
     private double predictionError;
     private double fitness;
     private int exp; // experience
@@ -13,13 +15,12 @@ public class Classifier {
     private int numerosisty = 1;
 
     public Classifier(Situation situation, int timestep) {
-        //condition = new Condition(situation);
+        condition = new Condition(situation);
         this.ts = timestep;
     }
 
     public boolean matchesSituation(Situation situation) {
-        // checks if the Situation matches this Classifier
-        // TODO: Implement this
+        condition.matchSituation(situation);
         return false;
     }
 
@@ -30,4 +31,21 @@ public class Classifier {
     public void setActionId(int actionId) {
         this.actionId = actionId;
     }
+
+    public int getNumerosisty() {
+        return numerosisty;
+    }
+
+    public double getPredictionError() {
+        return predictionError;
+    }
+
+    public double getFitness() {
+        return fitness;
+    }
+
+    public void setFitness(double fitness) {
+        this.fitness = fitness;
+    }
+
 }

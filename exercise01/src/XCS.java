@@ -2,6 +2,7 @@ import bwapi.Game;
 import bwapi.Unit;
 import bwapi.UnitType;
 
+import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
@@ -118,6 +119,22 @@ public class XCS {
 
     private void generateActionSet() {
 
+    }
+
+    public void updateFitness(HashSet<Classifier> actionSet) {
+        double accuracySum = 0;
+        Map<Classifier, Double> kappa = new HashMap<Classifier, Double>();
+        for (Classifier cl : actionSet) {
+            if (cl.getPredictionError() < epsilon0) {
+                kappa.put(cl, 1.);
+            } else {
+                kappa.put(cl, alpha * Math.pow(cl.getPredictionError() / epsilon0, nu));
+            }
+            accuracySum = accuracySum + kappa.get(cl) * cl.getNumerosisty();
+        }
+        for (Classifier cl : actionSet) {
+            cl.setFitness(cl.getFitness() + beta * (kappa.get(cl) * cl.getNumerosisty() / accuracySum - cl.getFitness()));
+        }
     }
 
     public void reward(double reward) {
