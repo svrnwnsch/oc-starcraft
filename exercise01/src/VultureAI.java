@@ -17,6 +17,8 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     private HashSet<Unit> enemyUnits;
     private int frame;
     private HashSet<Unit> alliedUnits = new HashSet<Unit>();
+    private XCS xcs;
+
 
     public VultureAI() {
         LOGGER.setLevel(Level.INFO);
@@ -41,7 +43,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
         this.game = this.bwapi.getGame();
         this.self = game.self();
         this.frame = 0;
-
+        xcs = new XCS(game);
         // complete map information
         this.game.enableFlag(0);
         
@@ -95,14 +97,19 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     
     @Override
     public void onUnitDestroy(Unit unit) {
-    	if(this.enemyUnits.contains(unit)){
-            this.enemyUnits.remove(unit);
-    	}
+        if (unit.getPlayer() == this.self)
+            xcs.reward(Rewards.DESTROYED_ALLY);
+        else
+            xcs.reward(Rewards.DESTROY_ENEMY);
     }
     
 
     @Override
     public void onEnd(boolean winner) {
+        if (winner)
+            xcs.reward(Rewards.WIN_GAME);
+        else
+            xcs.reward(Rewards.LOSE_GAME);
     }
 
     @Override
@@ -127,7 +134,8 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
 
     @Override
     public void onUnitShow(Unit unit) {
-
+        if (unit.getPlayer() != this.self)
+            xcs.reward(Rewards.FIND_UNIT);
     }
 
     @Override

@@ -13,13 +13,12 @@ public class Classifier {
     private int numerosity = 1;
 
     public Classifier(Situation situation, int timestep) {
-        //condition = new Condition(situation);
+        condition = new Condition(situation);
         this.ts = timestep;
     }
 
     public boolean matchesSituation(Situation situation) {
-        // checks if the Situation matches this Classifier
-        // TODO: Implement this
+        condition.matchSituation(situation);
         return false;
     }
 
@@ -31,11 +30,25 @@ public class Classifier {
         this.actionId = actionId;
     }
 
-    public double getPrediction() {
-        return prediction;
+    public int getNumerosisty() {
+        return numerosity;
+    }
+
+    public double getPredictionError() {
+        return predictionError;
     }
 
     public double getFitness() {
         return fitness;
     }
+
+    public void setFitness(double fitness) {
+        this.fitness = fitness;
+    }
+
+
+    public double getPrediction() {
+        return prediction;
+    }
+
 }
