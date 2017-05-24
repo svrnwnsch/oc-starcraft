@@ -4,7 +4,7 @@ import java.util.*;
 /**
  * Created by Severin Wünsch on 22.05.17.
  */
-public class Condition {
+public class Condition implements java.io.Serializable {
     public static final double sigma =  1./2.2;
 
     public Situation situation;

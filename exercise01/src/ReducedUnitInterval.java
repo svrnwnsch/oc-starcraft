@@ -9,7 +9,7 @@ import java.util.Random;
 /**
  * Created by Severin Wünsch on 22.05.17.
  */
-public class ReducedUnitInterval {
+public class ReducedUnitInterval implements java.io.Serializable {
     //public static String bla = "bla";
 
     public double normedDistanceInterval;

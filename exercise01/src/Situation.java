@@ -8,7 +8,7 @@ import java.util.ArrayList;
 /**
  * Created by Severin Wünsch on 22.05.17.
  */
-public class Situation {
+public class Situation implements java.io.Serializable {
 
     public static final int closestAlliesArraySize = 3;
     public static final int closestEnemiesArraySize = 3;
