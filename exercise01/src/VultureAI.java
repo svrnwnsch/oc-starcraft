@@ -19,7 +19,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     private HashSet<Unit> alliedUnits = new HashSet<Unit>();
 
     public VultureAI() {
-        LOGGER.setLevel(Level.CONFIG);
+        LOGGER.setLevel(Level.INFO);
 
         // Code so that console shows all logger events down to finer
         ConsoleHandler handler = new ConsoleHandler();
@@ -67,9 +67,8 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
                     //LOGGER.info("Unit is the from player" + unit.getPlayer());
                     alliedUnits.add(unit);
                     Situation situation = new Situation(unit, game);
-                    HashSet<Unit> enemyUnits = situation.getEnemiesOnMap();
-                    LOGGER.info("Enemy Units:" + situation.getNumberSightedEnemiesOnMap());
-                    LOGGER.info("Allied Units:" + situation.getNumberAlliesOnMap());
+                    LOGGER.config("Enemy Units:" + situation.getNumberSightedEnemiesOnMap());
+                    LOGGER.config("Allied Units:" + situation.getNumberAlliesOnMap());
 
                 }
             }
