@@ -4,13 +4,13 @@
 public class Classifier {
     private Condition condition;
     private int actionId;
-    private double prediction;
-    private double predictionError;
-    private double fitness;
-    private int exp; // experience
+    private double prediction = XCS.pInit;
+    private double predictionError = XCS.epsilonInit;
+    private double fitness = XCS.FInit;
+    private int exp = 0; // experience
     private int ts;  // time stamp
     private double actionSetSize = 1;
-    private int numerosisty = 1;
+    private int numerosity = 1;
 
     public Classifier(Situation situation, int timestep) {
         //condition = new Condition(situation);
@@ -29,5 +29,13 @@ public class Classifier {
 
     public void setActionId(int actionId) {
         this.actionId = actionId;
+    }
+
+    public double getPrediction() {
+        return prediction;
+    }
+
+    public double getFitness() {
+        return fitness;
     }
 }
