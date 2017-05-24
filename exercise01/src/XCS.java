@@ -2,9 +2,7 @@ import bwapi.Game;
 import bwapi.Unit;
 import bwapi.UnitType;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Created by Severin Wünsch on 22.05.17.
@@ -15,6 +13,7 @@ import java.util.TreeSet;
  */
 public class XCS {
     private Game game;
+    private Random random = new Random();
 
     private HashSet<Classifier> population; // population of all classifiers in XCS
     private HashSet<Classifier> matchSet; // match set for current environment
@@ -40,11 +39,11 @@ public class XCS {
     private double thetaDel = 20; // deletion threshold
     private double delta = 0.1;
     private double thetaSub = 20; // subsumption threshold
-    private double pInit = 0;
-    private double epsilonInit = 0;
-    private double FInit = 0;
+    public static double pInit = 0; // Predicted reward init
+    public static double epsilonInit = 0; // prediction error init
+    public static double FInit = 0; // Fitness init
     private double pExplor = 0.5; // exploration probability
-    private int thetaMNA = 1; // number of all possible Action TODO: generate from code: number of all possible actions
+    private int thetaMNA; // number of all possible Action
 
     private int timestep = 0;
 
@@ -53,6 +52,7 @@ public class XCS {
         actionSet = new HashSet<Classifier>(); // initialize set
         matchSet = new HashSet<Classifier>();
         population = new HashSet<>(N);
+        actionDic.put(0, new HoldAction()); // Do Nothing
         actionDic.put(1, new MoveAction(this.game, 0)); // Move Right
         actionDic.put(2, new MoveAction(this.game, 45)); // Move Right Down
         actionDic.put(3, new MoveAction(this.game, 90)); // Move Down
@@ -67,7 +67,7 @@ public class XCS {
             actionDic.put(100 + ReducedUnit.unitTypeMap.get(unitType), new AttackClosestEnemyAction(unitType, this.game));
         }
 
-
+        thetaMNA = actionDic.size();
     }
 
     public void step(Unit unit) {
@@ -80,9 +80,10 @@ public class XCS {
         lastActionSet = (HashSet<Classifier>) actionSet.clone();
         // empty Matchset
         generateMatchSet(unit);
-        generatePredictionSet();
-        generateActionSet();
+        int selectedActionId = selectActionId();
+        generateActionSet(selectedActionId);
 
+        reward(unit, actionDic.get(selectedActionId).executeAction(unit));
 
     }
 
@@ -112,16 +113,67 @@ public class XCS {
         }
     }
 
-    private void generatePredictionSet() {
+    private int selectActionId() {
+        // initialize predictionSet and fitnessSumSet
+        HashMap<Integer, Double> predictionSet = new HashMap<Integer, Double>(actionDic.size());
+        HashMap<Integer, Double> fitnessSumSet = new HashMap<Integer, Double>(actionDic.size());
+        for (int i : actionDic.keySet()) {
+            predictionSet.put(i, null);
+            fitnessSumSet.put(i, 0.0);
+        }
+
+        for (Classifier classifier : matchSet) {
+            int aId = classifier.getActionId();
+            if (predictionSet.get(aId) == null) {
+                predictionSet.put(aId, classifier.getPrediction() * classifier.getFitness());
+            } else {
+                predictionSet.put(aId, predictionSet.get(aId) + classifier.getPrediction() * classifier.getFitness());
+            }
+            fitnessSumSet.put(aId, fitnessSumSet.get(aId) + classifier.getFitness());
+        }
+        for (int aId : fitnessSumSet.keySet()) {
+            if (fitnessSumSet.get(aId) != 0) {
+                predictionSet.put(aId, predictionSet.get(aId) / fitnessSumSet.get(aId));
+            }
+        }
+
+        // TODO: Select action probability based on prediction array and not only best
+        predictionSet.values().removeIf(Objects::isNull); // remove all Actions where it is null
+        int selectedActionId = -1;
+        if (random.nextDouble() < pExplor) {
+            List<Integer> aIds = new ArrayList<Integer>(predictionSet.keySet());
+            selectedActionId = aIds.get(random.nextInt(aIds.size()));
+        } else {
+            double bestPrediction = Double.NEGATIVE_INFINITY;
+            for (int aId : predictionSet.keySet()) {
+                if (predictionSet.get(aId) > bestPrediction) {
+                    bestPrediction = predictionSet.get(aId);
+                    selectedActionId = aId;
+                }
+            }
+        }
+        return selectedActionId;
 
     }
 
-    private void generateActionSet() {
-
+    // updates the actionSet based on the current match set and the selectedActionId
+    private void generateActionSet(int selectedActionId) {
+        actionSet.clear();
+        for (Classifier classifier : matchSet) {
+            if (classifier.getActionId() == selectedActionId) {
+                actionSet.add(classifier);
+            }
+        }
     }
 
     public void reward(double reward) {
-        // Function Adds the given reward to the action and lastActionSet
+        // Function Adds the given reward to the action and lastActionSet for every unit
+    }
+
+    public void reward(Unit unit, double reward) {
+        // Function adds the given reward to the action and lastActionSet for the specific unit
+        // TODO: Implement specific Reward method
+        reward(reward);
     }
 
     public void deleteFromPopulation() {
