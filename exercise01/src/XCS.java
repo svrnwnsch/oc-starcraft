@@ -1,4 +1,10 @@
+import bwapi.Game;
+import bwapi.Unit;
+import bwapi.UnitType;
+
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 /**
  * Created by Severin Wünsch on 22.05.17.
@@ -8,10 +14,17 @@ import java.util.HashSet;
  * In the future specialised XCS should be extended for each class
  */
 public class XCS {
-    private HashSet<Condition> population; // population of all classifiers in XCS
-    private HashSet<Condition> matchSet; // match set for current environment
-    private HashSet<Condition> actionSet; // action set of all classifiers
-    private HashSet<Condition> lastActionSet; // action set of last action for delayed reward
+    private Game game;
+
+    private HashSet<Classifier> population; // population of all classifiers in XCS
+    private HashSet<Classifier> matchSet; // match set for current environment
+
+    //TODO: replace two step reward with multistep reward an queue of fixed last k action sets
+    private HashSet<Classifier> actionSet; // action set of all classifiers
+    private HashSet<Classifier> lastActionSet; // action set of last action for delayed reward
+
+    private HashMap<Integer, Action> actionDic;
+
 
     // XCS parameters taken from "An Algorithmic Description of XCS"
 
@@ -33,11 +46,96 @@ public class XCS {
     private double pExplor = 0.5; // exploration probability
     private int thetaMNA = 1; // number of all possible Action TODO: generate from code: number of all possible actions
 
-    public void loadXCS(String filename) {
+    private int timestep = 0;
+
+    public XCS(Game game) {
+        this.game = game;
+        actionSet = new HashSet<Classifier>(); // initialize set
+        matchSet = new HashSet<Classifier>();
+        population = new HashSet<>(N);
+        actionDic.put(1, new MoveAction(this.game, 0)); // Move Right
+        actionDic.put(2, new MoveAction(this.game, 45)); // Move Right Down
+        actionDic.put(3, new MoveAction(this.game, 90)); // Move Down
+        actionDic.put(4, new MoveAction(this.game, 135)); // Move Left Down
+        actionDic.put(5, new MoveAction(this.game, 180)); // Move Left
+        actionDic.put(6, new MoveAction(this.game, 225)); // Move Left Up
+        actionDic.put(7, new MoveAction(this.game, 270)); // Move Up
+        actionDic.put(8, new MoveAction(this.game, 315)); // Move Right Up
+
+        // Generate Attack Closest Enemy for Each unit type listed in ReducedUnit.uniTypedMap
+        for (UnitType unitType : ReducedUnit.unitTypeMap.keySet()) {
+            actionDic.put(100 + ReducedUnit.unitTypeMap.get(unitType), new AttackClosestEnemyAction(unitType, this.game));
+        }
+
 
     }
 
-    public void saveXCS(String filename) {
+    public void step(Unit unit) {
+        // Executes one Step of the XCS system for the submitted unit
+        // TODO: Problem if we have more then one Unit the action set and last action set should be saved for each unit
+        //       with respect their last actions
 
+        // Shallow Copy of action set into last actions set
+        timestep++;
+        lastActionSet = (HashSet<Classifier>) actionSet.clone();
+        // empty Matchset
+        generateMatchSet(unit);
+        generatePredictionSet();
+        generateActionSet();
+
+
+    }
+
+    private void generateMatchSet(Unit unit) {
+        matchSet.clear();
+        Situation currentSituation = new Situation(unit, game);
+        while (matchSet.isEmpty()) {
+            for (Classifier classifier : population) {
+                if (classifier.matchesSituation(currentSituation))
+                    matchSet.add(classifier);
+            }
+            HashSet<Integer> actionsId = new HashSet<Integer>();
+            for (Classifier matchClass : matchSet) {
+                actionsId.add(matchClass.getActionId());
+            }
+            if (actionsId.size() < thetaMNA) {
+                TreeSet<Integer> missingActionIds = new TreeSet<>(actionDic.keySet());
+                missingActionIds.removeAll(actionsId);
+                for (int i : missingActionIds) {
+                    Classifier newClassifier = new Classifier(currentSituation, timestep);
+                    newClassifier.setActionId(i);
+                }
+                deleteFromPopulation();
+                matchSet.clear();
+
+            }
+        }
+    }
+
+    private void generatePredictionSet() {
+
+    }
+
+    private void generateActionSet() {
+
+    }
+
+    public void reward(double reward) {
+        // Function Adds the given reward to the action and lastActionSet
+    }
+
+    public void deleteFromPopulation() {
+        // Removes Conditions from the population until the size of the population is N
+        // TODO: Implement Method
+    }
+
+    public void loadXCS(String filename) {
+        // Loads a XCS from a given filename
+        // TODO: Implement Loading functionality
+    }
+
+    public void saveXCS(String filename) {
+        // Serializes the XCS into a file in filename
+        // TODO: Implement Save functionality
     }
 }

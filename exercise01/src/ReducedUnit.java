@@ -2,23 +2,21 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 
-import java.util.Map;
 import java.util.HashMap;
-
-import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by Severin Wünsch on 22.05.17.
  */
 public class ReducedUnit {
     //public static String bla = "bla";
-    public static final Map<UnitType, Double> unitTypeMap = createMap();
+    public static final Map<UnitType, Integer> unitTypeMap = createMap();
 
-    public static Map<UnitType, Double> createMap() {
-        Map<UnitType, Double> typeMap = new HashMap<UnitType, Double>();
-        typeMap.put(UnitType.Terran_Command_Center, 0.0);
-        typeMap.put(UnitType.Protoss_Zealot, 0.1);
-        typeMap.put(UnitType.Terran_Vulture, 0.2);
+    public static Map<UnitType, Integer> createMap() {
+        Map<UnitType, Integer> typeMap = new HashMap<UnitType, Integer>();
+        typeMap.put(UnitType.Terran_Command_Center, 0);
+        typeMap.put(UnitType.Protoss_Zealot, 1);
+        typeMap.put(UnitType.Terran_Vulture, 2);
         return typeMap;
     }
 
@@ -31,7 +29,7 @@ public class ReducedUnit {
         this.normedHitPoints = ConditionUtil.parseValue(unit.getHitPoints(), unit.getType().maxHitPoints());
         this.normedDistance = ((double) position.getDistance(unit.getPosition())) / Situation.maxDistance;
         this.normedAngle = calculateAngle(position, unit.getPosition());
-        this.unitType = unitTypeMap.get(unit.getType());
+        this.unitType = ((double) unitTypeMap.get(unit.getType())) / 100;
     }
 
     public double calculateAngle(Position centerPosition, Position relativePosition){
