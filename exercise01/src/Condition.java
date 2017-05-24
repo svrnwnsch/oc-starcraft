@@ -5,54 +5,51 @@ import java.util.*;
  * Created by Severin Wünsch on 22.05.17.
  */
 public class Condition {
+    public static final double sigma =  1./2.2;
 
-    public static final int alliesArraySize = 5;
-    public static final int enemiesArraySize = 5;
-    public static final int maxUnits = 50;
-    public static final int maxPosX = 1000;
-    public static final int maxPosY = 1000;
+    public Situation situation;
 
+    public double unitHitPointsInterval;
+    public double unitPosXInterval;
+    public double unitPosYInterval;
+    public double unitGroundCooldownInterval;
 
-    private double unitPosX;
-    private double unitPosY;
+    public double numberAlliesOnMapInterval;
+    public double numberEnemiesOnMapInterval;
+    public double numberSightedEnemiesOnMapInterval;
+    public double killCountEnemiesInterval;
+    public double killCountAlliesInterval;
+
+    public ArrayList<ReducedUnitInterval> closestEnemiesInterval;
+    public ArrayList<ReducedUnitInterval> closestAlliesInterval;
 
     
+    //Covering Function
+    public Condition(Situation situation){
+        this.situation = situation;
 
-    public Condition(Unit unit){
-        int numberAlliesInSight = getNumberAlliesInSight();
-        int numberEnemiesOnMap = getNumberEnemiesInSight();
-        int killCountEnemies = getKillCountEnemies();
-        int killCountAllies = getKillCountAllies();
+        Random random = new Random();
+        unitHitPointsInterval = Math.abs(random.nextGaussian()*sigma);
+        unitPosXInterval = Math.abs(random.nextGaussian()*sigma);
+        unitPosYInterval = Math.abs(random.nextGaussian()*sigma);
+        unitGroundCooldownInterval = Math.abs(random.nextGaussian()*sigma);
+        numberAlliesOnMapInterval = Math.abs(random.nextGaussian()*sigma);
+        numberEnemiesOnMapInterval = Math.abs(random.nextGaussian()*sigma);
+        numberSightedEnemiesOnMapInterval = Math.abs(random.nextGaussian()*sigma);
+        killCountAlliesInterval = Math.abs(random.nextGaussian()*sigma);
+        killCountEnemiesInterval = Math.abs(random.nextGaussian()*sigma);
+        closestAlliesInterval = new ArrayList<ReducedUnitInterval>(Situation.closestAlliesArraySize);
+        for(int i=0; i<Situation.closestAlliesArraySize; i++){
+            closestAlliesInterval.add(i, new ReducedUnitInterval(random));
+        }
+        closestEnemiesInterval = new ArrayList<ReducedUnitInterval>(Situation.closestEnemiesArraySize);
+        for(int i=0; i<Situation.closestEnemiesArraySize; i++){
+            closestEnemiesInterval.add(i, new ReducedUnitInterval(random));
+        }
 
-        ArrayList<Unit> enemiesInSight = new ArrayList<Unit>();
-        enemiesInSight = getEnemiesInSight();
-        ArrayList<Unit> alliesInSight = new ArrayList<Unit>();
-        alliesInSight = getAlliesInSight();
     }
 
-    private ArrayList<Unit> getAlliesInSight() {
-        return null;
-    }
 
-    private ArrayList<Unit> getEnemiesInSight() {
-        return null;
-    }
-
-    private int getKillCountAllies() {
-        return 0;
-    }
-
-    private int getKillCountEnemies() {
-        return 0;
-    }
-
-    private int getNumberEnemiesInSight() {
-        return 0;
-    }
-
-    private int getNumberAlliesInSight() {
-        return 0;
-    }
     //private Pattern conditionPattern;
 
     //public Condition(String regex) {
