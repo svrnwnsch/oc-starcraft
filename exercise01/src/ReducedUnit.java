@@ -20,10 +20,14 @@ public class ReducedUnit {
         return typeMap;
     }
 
-    public double normedDistance;
-    public double normedAngle;
-    public double normedHitPoints;
-    public double unitType;
+    public double normedDistance = 1.;
+    public double normedAngle = 1.;
+    public double normedHitPoints = 1.;
+    public double unitType = 1.;
+
+    public ReducedUnit(){
+
+    }
 
     public ReducedUnit(Unit unit, Position position){
         this.normedHitPoints = ConditionUtil.parseValue(unit.getHitPoints(), unit.getType().maxHitPoints());
