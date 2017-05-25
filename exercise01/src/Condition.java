@@ -22,7 +22,20 @@ public class Condition implements java.io.Serializable {
     public ArrayList<ReducedUnitInterval> closestEnemiesInterval;
     public ArrayList<ReducedUnitInterval> closestAlliesInterval;
 
-    
+    public void printCondition() {
+        System.out.print("\tunitHitInterval: " + unitHitPointsInterval);
+        System.out.print("\tunitPosXInter: " + unitPosXInterval);
+        System.out.print("\tUnitPosYInter: " + unitPosYInterval);
+        System.out.print("\tunitGroundcoolInter" + unitGroundCooldownInterval);
+        System.out.print("\tnumbersightedenemiesonmap" + numberSightedEnemiesOnMapInterval);
+        for (ReducedUnitInterval reducedUnitInterval : closestEnemiesInterval) {
+            reducedUnitInterval.printReducedUnitInterval();
+        }
+        System.out.println("");
+        situation.printSituation();
+
+    }
+
     //Covering Function
     public Condition(Situation situation){
         this.situation = situation;

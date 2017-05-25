@@ -17,6 +17,13 @@ public class ReducedUnitInterval implements java.io.Serializable {
     public double normedHitPointsInterval;
     public double unitTypeInterval;
 
+    public void printReducedUnitInterval() {
+        System.out.print("\tnormedhitpointsinverval" + normedHitPointsInterval);
+        System.out.print("\tnormedangleinter" + normedAngleInterval);
+        System.out.print("\tnormedhitpointsintver" + normedHitPointsInterval);
+        System.out.print("\tunitTypeInterval" + unitTypeInterval);
+    }
+
     public ReducedUnitInterval(double normedDistanceInterval, double normedAngleInterval, double normedHitPointsInterval, double unitTypeInterval){
         this.normedDistanceInterval = normedDistanceInterval;
         this.normedAngleInterval = normedAngleInterval;

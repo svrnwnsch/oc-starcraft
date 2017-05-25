@@ -33,6 +33,18 @@ public class Situation implements java.io.Serializable {
     private ArrayList<ReducedUnit> closestEnemies;
     private ArrayList<ReducedUnit> closestAllies;
 
+    public void printSituation() {
+        System.out.print("\tunithitpoints" + unitHitPoints);
+        System.out.print("\tunitposx" + unitPosX);
+        System.out.print("\tunitposy" + unitPosY);
+        System.out.print("\tunitgroundcooldown" + unitGroundCooldown);
+        System.out.print("\tunmbersightedenemiesonmap" + numberSightedEnemiesOnMap);
+        for (ReducedUnit reducedUnit : closestEnemies) {
+            reducedUnit.printReducedUnit();
+        }
+        System.out.println();
+    }
+
 
     public Situation(Unit unit, Game game) {
         //Values are always parsed on [0.,1.]

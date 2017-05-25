@@ -17,6 +17,17 @@ public class Classifier implements java.io.Serializable {
         this.ts = timestep;
     }
 
+
+    public void printClassifier() {
+        System.out.print("ActionId: " + actionId);
+        System.out.print("\tprediction: " + prediction);
+        System.out.print("\tpredictionError: " + predictionError);
+        System.out.print("\tfitness: " + fitness);
+        System.out.print("\texperience: " + exp);
+        System.out.println("\tactionSetSize" + actionSetSize);
+        condition.printCondition();
+    }
+
     public boolean matchesSituation(Situation situation) {
         return condition.matchSituation(situation);
     }
@@ -85,4 +96,6 @@ public class Classifier implements java.io.Serializable {
         }
         return vote;
     }
+
+
 }

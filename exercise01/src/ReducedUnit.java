@@ -25,6 +25,13 @@ public class ReducedUnit implements java.io.Serializable {
     public double normedHitPoints = 1.;
     public double unitType = 1.;
 
+    public void printReducedUnit() {
+        System.out.print("\tnormeddistance" + normedDistance);
+        System.out.print("\tnormedangle" + normedAngle);
+        System.out.print("\tnormedHitpoints" + normedHitPoints);
+        System.out.print("\tunittype" + unitType);
+    }
+
     public ReducedUnit(){
 
     }

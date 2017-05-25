@@ -361,6 +361,7 @@ public class XCS {
             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
             for (Classifier cl : population) {
                 objectOut.writeObject(cl);
+                cl.printClassifier();
             }
             objectOut.close();
             fileOut.close();
