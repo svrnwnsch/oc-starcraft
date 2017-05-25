@@ -10,8 +10,8 @@ import java.util.List;
  */
 public class Situation implements java.io.Serializable {
 
-    public static final int closestAlliesArraySize = 3;
-    public static final int closestEnemiesArraySize = 3;
+    public static final int closestAlliesArraySize = 0;
+    public static final int closestEnemiesArraySize = 1;
     public static final int maxUnits = 50;
     //manually determined for current map(Karte-Aufgabe4_v1.scx)
     public static final int maxPosX = 5000;

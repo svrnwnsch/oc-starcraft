@@ -4,7 +4,7 @@ import java.util.Random;
  * Created by Severin Wünsch on 22.05.17.
  */
 public class Condition implements java.io.Serializable {
-    public static final double sigma =  1./2.2;
+    public static final double sigma = 1. / 10.;
 
     public Situation situation;
 
@@ -45,8 +45,6 @@ public class Condition implements java.io.Serializable {
         for(int i=0; i<Situation.closestEnemiesArraySize; i++){
             closestEnemiesInterval.add(i, new ReducedUnitInterval(random));
         }
-
-
 
     }
 

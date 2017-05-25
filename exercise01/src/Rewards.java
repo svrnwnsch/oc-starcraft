@@ -5,7 +5,7 @@
  */
 public class Rewards {
     // Positive Rewards
-    public static final double LEGAL_MOVE = 0;
+    public static final double LEGAL_MOVE = -0.1;
     public static final int DESTROY_ENEMY = 100;
     public static final int FIND_UNIT = 10;
     public static final int WIN_GAME = 1000;

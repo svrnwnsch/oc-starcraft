@@ -21,6 +21,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     private HashMap<Unit, Integer> friendlyUnitHealth = new HashMap<>();
     private int wonGames = 0;
     private int lostGames = 0;
+    private boolean loadGame = false;
 
 
     public VultureAI() {
@@ -50,7 +51,8 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
         LOGGER.config("Clearing FriendlyUnitHealth");
         if (xcs == null)
             xcs = new XCS(game);
-        xcs.loadXCS(XCS.fileName);
+        if (loadGame)
+            xcs.loadXCS(XCS.fileName);
         // complete map information
         this.game.enableFlag(0);
         
@@ -66,7 +68,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
         //vulture.step();
         List<Unit> allUnits = game.getAllUnits();
         //LOGGER.info("size of all Units:" + allUnits.size());
-        if (frame % 1 == 0) {
+        if (frame % 5 == 0) {
             // execute xcs only every second frame
 
             for (Unit unit : allUnits) {

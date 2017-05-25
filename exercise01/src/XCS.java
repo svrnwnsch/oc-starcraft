@@ -3,14 +3,9 @@ import bwapi.Unit;
 import bwapi.UnitType;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.TreeSet;
 
 /**
  * Created by Severin Wünsch on 22.05.17.
@@ -24,7 +19,7 @@ public class XCS {
     private Random random = new Random();
     private final static Logger LOGGER = Logger.getLogger(VultureAI.class.getName());
     public static String fileDirectory = "data";
-    public static String fileName = fileDirectory + "\\xcs.ser";
+    public static String fileName = fileDirectory + "\\xcs1.ser";
 
     private HashSet<Classifier> population; // population of all classifiers in XCS
     private HashSet<Classifier> matchSet; // match set for current environment
@@ -55,7 +50,7 @@ public class XCS {
     public static double pInit = 0; // Predicted reward init
     public static double epsilonInit = 0; // prediction error init
     public static double FInit = 0; // Fitness init
-    private double pExplor = 0.1; // exploration probability
+    private double pExplor = 0.2; // exploration probability
     private int thetaMNA; // number of all possible Action
 
     private int timestep = 0;
@@ -73,11 +68,11 @@ public class XCS {
         LOGGER.info("Initialised HoldAction");
         actionDic.put(1, new MoveAction(this.game, 0)); // Move Right
         //actionDic.put(2, new MoveAction(this.game, 45)); // Move Right Down
-        actionDic.put(3, new MoveAction(this.game, 90)); // Move Down
+        //actionDic.put(3, new MoveAction(this.game, 90)); // Move Down
         //actionDic.put(4, new MoveAction(this.game, 135)); // Move Left Down
         actionDic.put(5, new MoveAction(this.game, 180)); // Move Left
         //actionDic.put(6, new MoveAction(this.game, 225)); // Move Left Up
-        actionDic.put(7, new MoveAction(this.game, 270)); // Move Up
+        //actionDic.put(7, new MoveAction(this.game, 270)); // Move Up
         //actionDic.put(8, new MoveAction(this.game, 315)); // Move Right Up
         LOGGER.info("Initialised MoveActions");
 
@@ -333,12 +328,12 @@ public class XCS {
             objectIn.close();
             fileIn.close();
         } catch (Exception e) {
-            System.out.println("File Loading Error");
+            LOGGER.severe("File Loading Error");
             e.printStackTrace();
         }
-        System.out.println("Loading " + filename + "completed");
-        System.out.println(population.size() + " Classifier loaded");
-        System.out.println("Current path: " + Paths.get("").toAbsolutePath().toString());
+        LOGGER.info("Loading " + filename + "completed");
+        LOGGER.info(population.size() + " Classifier loaded");
+        LOGGER.fine("Current path: " + Paths.get("").toAbsolutePath().toString());
         // Loads a XCS from a given filename
         // TODO: Implement Loading functionality
     }
@@ -348,7 +343,7 @@ public class XCS {
             if (!new File(fileDirectory).exists()) {
                 new File(fileDirectory).mkdirs();
             }
-            System.out.println("Saving XCS-file");
+            LOGGER.config("Saving XCS-file");
             FileOutputStream fileOut = new FileOutputStream(filename);
             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
             for (Classifier cl : population) {
@@ -356,9 +351,9 @@ public class XCS {
             }
             objectOut.close();
             fileOut.close();
-            System.out.println("Population has been saved under: " + filename);
+            LOGGER.info("Population has been saved under: " + filename);
         } catch (Exception e) {
-            System.out.println("File Saving Error!");
+            LOGGER.severe("File Saving Error!");
 
             e.printStackTrace();
 
