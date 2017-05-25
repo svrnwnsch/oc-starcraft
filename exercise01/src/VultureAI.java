@@ -1,6 +1,6 @@
 import bwapi.*;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -14,10 +14,13 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     private Game game;
     private Player self;
     private Vulture vulture;
-    private HashSet<Unit> enemyUnits;
+    // private HashSet<Unit> enemyUnits;
     private int frame;
-    private HashSet<Unit> alliedUnits = new HashSet<Unit>();
+    //private HashSet<Unit> alliedUnits = new HashSet<Unit>();
     private XCS xcs;
+    private HashMap<Unit, Integer> friendlyUnitHealth = new HashMap<>();
+    private int wonGames = 0;
+    private int lostGames = 0;
 
 
     public VultureAI() {
@@ -39,10 +42,12 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
 
     @Override
     public void onStart() {
-        enemyUnits = new HashSet<Unit>();
+        //enemyUnits = new HashSet<Unit>();
         this.game = this.bwapi.getGame();
         this.self = game.self();
         this.frame = 0;
+        friendlyUnitHealth.clear();
+        LOGGER.config("Clearing FriendlyUnitHealth");
         if (xcs == null)
             xcs = new XCS(game);
         xcs.loadXCS(XCS.fileName);
@@ -69,15 +74,31 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
                 //LOGGER.info(unit);
 
                 //LOGGER.info(unit.getPlayer());
-                if (unit.getPlayer() == this.self && unit.getType() == UnitType.Terran_Vulture) {
-                    LOGGER.fine("Unit is the from player" + unit.getPlayer());
-                    xcs.step(unit);
-                    /*
-                    Situation situation = new Situation(unit, game);
-                    LOGGER.config("Enemy Units:" + situation.getNumberSightedEnemiesOnMap());
-                    LOGGER.config("Allied Units:" + situation.getNumberAlliesOnMap());
-                    */
+                if (unit.getPlayer() == this.self) {
+                    if (!friendlyUnitHealth.containsKey(unit)) {
+                        friendlyUnitHealth.put(unit, unit.getHitPoints());
+                    } else { // check if unit is in Map is necessary to avoid NPE at start
+                        int dmgTaken = friendlyUnitHealth.get(unit) - unit.getHitPoints();
+                        LOGGER.fine("Unit selected to calculate Healthchange " + unit);
+                        if (dmgTaken > 0) {
+                            LOGGER.config("Unit took dmg " + dmgTaken);
+                            if (!unit.getType().isBuilding())
+                                xcs.reward(unit, Rewards.TAKE_DAMAGE_REWARD_MULTIPLIER * (-dmgTaken));
+                            else // If building apply penalty to all units
+                                xcs.reward(Rewards.TAKE_DAMAGE_REWARD_MULTIPLIER * (-dmgTaken));
+                            friendlyUnitHealth.replace(unit, unit.getHitPoints()); // update hitpoints
+                        }
+                    }
+                    if (unit.getType() == UnitType.Terran_Vulture) {
+                        LOGGER.fine("Unit " + unit + " is the from player" + unit.getPlayer());
+                        xcs.step(unit);
+                        /*
+                        Situation situation = new Situation(unit, game);
+                        LOGGER.config("Enemy Units:" + situation.getNumberSightedEnemiesOnMap());
+                        LOGGER.config("Allied Units:" + situation.getNumberAlliesOnMap());
+                        */
 
+                    }
                 }
             }
 
@@ -88,9 +109,16 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
 
     @Override
     public void onUnitCreate(Unit unit) {
+        // WARNING: the unit given here is not the same as in game.getAllUnits()
         LOGGER.info("New unit discovered " + unit.getType());
+        /*
         UnitType type = unit.getType();
 
+        if (unit.getPlayer() == this.self) {
+            friendlyUnitHealth.put(unit, unit.getHitPoints());
+            LOGGER.warning("Add Unit to Friendly units " + unit);
+        }
+        /*
         if (type == UnitType.Terran_Vulture) {
             if (unit.getPlayer() == this.self) {
                 this.vulture = new Vulture(unit, bwapi, enemyUnits);
@@ -100,24 +128,32 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
                 enemyUnits.add(unit);
             }
         }
+        */
     }
     
     @Override
     public void onUnitDestroy(Unit unit) {
-        if (unit.getPlayer() == this.self)
+        if (unit.getPlayer() == this.self) {
             xcs.reward(Rewards.DESTROYED_ALLY);
-        else
+            LOGGER.warning("Allied Unit was Destroyed " + unit.getType() + ": " + unit);
+        } else {
             xcs.reward(Rewards.DESTROY_ENEMY);
+            LOGGER.warning("Destroyed Enemy Unit " + unit.getType());
+        }
     }
     
 
     @Override
     public void onEnd(boolean winner) {
-        if (winner)
+        if (winner) {
             xcs.reward(Rewards.WIN_GAME);
-        else
+            wonGames++;
+        } else {
             xcs.reward(Rewards.LOSE_GAME);
-        LOGGER.warning("Game Ended did we win? " + winner + " Number of Classifiers: " + xcs.getPopSize());
+            lostGames++;
+        }
+        LOGGER.warning("Game Ended did we win? " + winner + " Number of Classifiers: " + xcs.getPopSize()
+                + " Number of games won: " + wonGames + " Number of games lost: " + lostGames);
         xcs.finnish();
     }
 
@@ -143,8 +179,10 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
 
     @Override
     public void onUnitShow(Unit unit) {
-        if (unit.getPlayer() != this.self)
+        if (unit.getPlayer() != this.self) {
             xcs.reward(Rewards.FIND_UNIT);
+            LOGGER.config("See a enemy Unit " + unit);
+        }
     }
 
     @Override

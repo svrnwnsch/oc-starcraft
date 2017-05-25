@@ -1,9 +1,9 @@
 import bwapi.Game;
 import bwapi.Unit;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Created by Severin Wünsch on 22.05.17.
@@ -26,9 +26,8 @@ public class Situation implements java.io.Serializable {
     private double unitGroundCooldown;
 
     private double numberAlliesOnMap;
-    private double numberEnemiesOnMap;
     private double numberSightedEnemiesOnMap;
-    private double killCountEnemies;
+    private double numberOfAllies;
     private double killCountAllies;
 
     private ArrayList<ReducedUnit> closestEnemies;
@@ -41,6 +40,14 @@ public class Situation implements java.io.Serializable {
         unitPosY = ConditionUtil.parseValue(unit.getY(), maxPosY);
         unitHitPoints = ConditionUtil.parseValue(unit.getHitPoints(), unit.getType().maxHitPoints());
         unitGroundCooldown = ConditionUtil.parseValue(unit.getGroundWeaponCooldown(), maxGroundCooldown);
+
+        int killCount = 0;
+        for (Unit u : game.getAllUnits()) {
+            if (u.getPlayer() == unit.getPlayer()) { // is unit of same player
+                killCount += u.getKillCount();
+            }
+        }
+        killCountAllies = ConditionUtil.parseValue(killCount, maxUnits);
 
         List<Unit> allUnits = game.getAllUnits();
         //Separating enemy units from allied units
@@ -116,12 +123,8 @@ public class Situation implements java.io.Serializable {
         return killCountAllies;
     }
 
-    public double getKillCountEnemies() {
-        return killCountEnemies;
-    }
-
-    public double getNumberEnemiesOnMap() {
-        return numberEnemiesOnMap;
+    public double getNumberOfAllies() {
+        return numberOfAllies;
     }
 
     public double getNumberAlliesOnMap() {

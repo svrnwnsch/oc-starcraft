@@ -153,7 +153,7 @@ public class XCS {
                 missingActionIds.removeAll(actionsId);
                 for (int i : missingActionIds) {
                     Classifier newClassifier = new Classifier(currentSituation, timestep);
-                    LOGGER.warning(population.size() + ": Created New Classifier with Action Id: " + i);
+                    LOGGER.info(population.size() + ": Created New Classifier with Action Id: " + i);
                     newClassifier.setActionId(i);
                     population.add(newClassifier);
                 }
