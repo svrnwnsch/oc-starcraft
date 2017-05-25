@@ -46,7 +46,7 @@ public class XCS {
     public static double pInit = 0; // Predicted reward init
     public static double epsilonInit = 0; // prediction error init
     public static double FInit = 0; // Fitness init
-    private double pExplor = 0.5; // exploration probability
+    private double pExplor = 0.1; // exploration probability
     private int thetaMNA; // number of all possible Action
 
     private int timestep = 0;
@@ -63,13 +63,13 @@ public class XCS {
         actionDic.put(0, new HoldAction()); // Do Nothing
         LOGGER.info("Initialised HoldAction");
         actionDic.put(1, new MoveAction(this.game, 0)); // Move Right
-        actionDic.put(2, new MoveAction(this.game, 45)); // Move Right Down
+        //actionDic.put(2, new MoveAction(this.game, 45)); // Move Right Down
         actionDic.put(3, new MoveAction(this.game, 90)); // Move Down
-        actionDic.put(4, new MoveAction(this.game, 135)); // Move Left Down
+        //actionDic.put(4, new MoveAction(this.game, 135)); // Move Left Down
         actionDic.put(5, new MoveAction(this.game, 180)); // Move Left
-        actionDic.put(6, new MoveAction(this.game, 225)); // Move Left Up
+        //actionDic.put(6, new MoveAction(this.game, 225)); // Move Left Up
         actionDic.put(7, new MoveAction(this.game, 270)); // Move Up
-        actionDic.put(8, new MoveAction(this.game, 315)); // Move Right Up
+        //actionDic.put(8, new MoveAction(this.game, 315)); // Move Right Up
         LOGGER.info("Initialised MoveActions");
 
         // Generate Attack Closest Enemy for Each unit type listed in ReducedUnit.uniTypedMap
@@ -272,7 +272,7 @@ public class XCS {
         // Removes Conditions from the population until the size of the population is N
         // TODO: Implement Method
         while (population.size() > N) {
-            LOGGER.warning("Population is full deleting a Classifier");
+
 
             double totalFitness = 0;
             int totalNumerosity = 0;
@@ -281,6 +281,7 @@ public class XCS {
                 totalNumerosity += c.getNumerosisty();
             }
             double avFitnessInPopulation = totalFitness / totalNumerosity;
+            LOGGER.warning("Population is full deleting a Classifier. Avg Fitness: " + avFitnessInPopulation);
             double voteSum = 0;
             for (Classifier c : population) {
                 voteSum += c.vote(avFitnessInPopulation);

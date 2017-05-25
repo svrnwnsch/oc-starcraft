@@ -19,7 +19,7 @@ public class MoveAction implements Action {
 
     public MoveAction(Game game, double moveAngle) {
         this.game = game;
-        this.moveAngle = moveAngle;
+        this.moveAngle = Math.toRadians(moveAngle);
     }
 
 
