@@ -2,12 +2,10 @@ import bwapi.Game;
 import bwapi.Unit;
 import bwapi.UnitType;
 
+import java.io.*;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,6 +22,7 @@ public class XCS {
     private Game game;
     private Random random = new Random();
     private final static Logger LOGGER = Logger.getLogger(VultureAI.class.getName());
+    public static String fileName = "data\\xcs.ser";
 
     private HashSet<Classifier> population; // population of all classifiers in XCS
     private HashSet<Classifier> matchSet; // match set for current environment
@@ -132,6 +131,7 @@ public class XCS {
     public void finnish() {
         // Method for last Evaluation when game finished
         updateClassifier(lastReward, actionSet);
+        saveXCS(fileName);
     }
 
     private void generateMatchSet(Unit unit) {
@@ -322,8 +322,11 @@ public class XCS {
             FileInputStream fileIn = new FileInputStream(filename);
             ObjectInputStream objectIn = new ObjectInputStream(fileIn);
             Classifier cl = null;
-            while ((cl = (Classifier) objectIn.readObject()) != null) {
-                population.add(cl);
+            try {
+                while ((cl = (Classifier) objectIn.readObject()) != null) {
+                    population.add(cl);
+                }
+            } catch (EOFException e) {
             }
             objectIn.close();
             fileIn.close();
@@ -331,12 +334,16 @@ public class XCS {
             System.out.println("File Loading Error");
             e.printStackTrace();
         }
+        System.out.println("Loading " + filename + "completed");
+        System.out.println(population.size() + " Classifier loaded");
+        System.out.println("Current path: " + Paths.get("").toAbsolutePath().toString());
         // Loads a XCS from a given filename
         // TODO: Implement Loading functionality
     }
 
     public void saveXCS(String filename) {
         try {
+            System.out.println("Saving XCS-file");
             FileOutputStream fileOut = new FileOutputStream(filename);
             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
             for (Classifier cl : population) {
@@ -347,7 +354,9 @@ public class XCS {
             System.out.println("Population has been saved under: " + filename);
         } catch (Exception e) {
             System.out.println("File Saving Error!");
+
             e.printStackTrace();
+
         }
         // Serializes the XCS into a file in filename
         // TODO: Implement Save functionality

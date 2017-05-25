@@ -45,6 +45,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
         this.frame = 0;
         if (xcs == null)
             xcs = new XCS(game);
+        xcs.loadXCS(XCS.fileName);
         // complete map information
         this.game.enableFlag(0);
         
