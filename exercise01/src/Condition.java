@@ -68,8 +68,7 @@ public class Condition implements java.io.Serializable {
                 (matchVariable(externSituation.getUnitGroundCooldown(), situation.getUnitGroundCooldown(), unitGroundCooldownInterval)) &&
                 (matchVariable(externSituation.getNumberAlliesOnMap(), situation.getNumberAlliesOnMap(), numberAlliesOnMapInterval)) &&
                 (matchVariable(externSituation.getNumberSightedEnemiesOnMap(), situation.getNumberSightedEnemiesOnMap(), numberSightedEnemiesOnMapInterval)) &&
-                (matchVariable(externSituation.getKillCountAllies(), situation.getKillCountAllies(), killCountAlliesInterval)) &&
-                (matchVariable(externSituation.getNumberOfAllies(), situation.getNumberOfAllies(), killCountEnemiesInterval));
+                (matchVariable(externSituation.getKillCountAllies(), situation.getKillCountAllies(), killCountAlliesInterval));
         for(int i=0; i<Situation.closestAlliesArraySize; i++){
             result = result && (matchVariable(externSituation.getClosestAllies().get(i).normedDistance, situation.getClosestAllies().get(i).normedDistance, closestAlliesInterval.get(i).normedDistanceInterval)) &&
                     (matchVariable(externSituation.getClosestAllies().get(i).normedAngle, situation.getClosestAllies().get(i).normedAngle, closestAlliesInterval.get(i).normedAngleInterval)) &&
