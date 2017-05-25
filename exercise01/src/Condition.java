@@ -1,6 +1,5 @@
-import java.util.regex.Pattern;
-import bwapi.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Random;
 /**
  * Created by Severin Wünsch on 22.05.17.
  */
@@ -57,10 +56,9 @@ public class Condition {
                 (matchVariable(externSituation.getUnitPosY(), situation.getUnitPosY(), unitPosYInterval)) &&
                 (matchVariable(externSituation.getUnitGroundCooldown(), situation.getUnitGroundCooldown(), unitGroundCooldownInterval)) &&
                 (matchVariable(externSituation.getNumberAlliesOnMap(), situation.getNumberAlliesOnMap(), numberAlliesOnMapInterval)) &&
-                (matchVariable(externSituation.getNumberEnemiesOnMap(), situation.getNumberEnemiesOnMap(), numberEnemiesOnMapInterval)) &&
                 (matchVariable(externSituation.getNumberSightedEnemiesOnMap(), situation.getNumberSightedEnemiesOnMap(), numberSightedEnemiesOnMapInterval)) &&
                 (matchVariable(externSituation.getKillCountAllies(), situation.getKillCountAllies(), killCountAlliesInterval)) &&
-                (matchVariable(externSituation.getKillCountEnemies(), situation.getKillCountEnemies(), killCountEnemiesInterval));
+                (matchVariable(externSituation.getNumberOfAllies(), situation.getNumberOfAllies(), killCountEnemiesInterval));
         for(int i=0; i<Situation.closestAlliesArraySize; i++){
             result = result && (matchVariable(externSituation.getClosestAllies().get(i).normedDistance, situation.getClosestAllies().get(i).normedDistance, closestAlliesInterval.get(i).normedDistanceInterval)) &&
                     (matchVariable(externSituation.getClosestAllies().get(i).normedAngle, situation.getClosestAllies().get(i).normedAngle, closestAlliesInterval.get(i).normedAngleInterval)) &&
