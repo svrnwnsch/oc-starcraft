@@ -11,13 +11,15 @@ import java.util.List;
 public class Situation implements java.io.Serializable {
 
     public static final int closestAlliesArraySize = 0;
-    public static final int closestEnemiesArraySize = 1;
+    public static final int closestEnemiesArraySize = 2;
     public static final int maxUnits = 50;
     //manually determined for current map(Karte-Aufgabe4_v1.scx)
     public static final int maxPosX = 5000;
     public static final int maxPosY = 4000;
     public static final int maxGroundCooldown = 100;
     public static final double maxDistance = Math.sqrt(maxPosX * maxPosX + maxPosY * maxPosY);
+    public static final int maxPossibleHP = 500;
+    // TODO: update if we have buildings
 
 
     private double unitHitPoints;
@@ -27,7 +29,6 @@ public class Situation implements java.io.Serializable {
 
     private double numberAlliesOnMap;
     private double numberSightedEnemiesOnMap;
-    private double numberOfAllies;
     private double killCountAllies;
 
     private ArrayList<ReducedUnit> closestEnemies;
@@ -38,7 +39,7 @@ public class Situation implements java.io.Serializable {
         //Values are always parsed on [0.,1.]
         unitPosX = ConditionUtil.parseValue(unit.getX(), maxPosX);
         unitPosY = ConditionUtil.parseValue(unit.getY(), maxPosY);
-        unitHitPoints = ConditionUtil.parseValue(unit.getHitPoints(), unit.getType().maxHitPoints());
+        unitHitPoints = ConditionUtil.parseValue(unit.getHitPoints(), maxPossibleHP);
         unitGroundCooldown = ConditionUtil.parseValue(unit.getGroundWeaponCooldown(), maxGroundCooldown);
 
         int killCount = 0;
@@ -121,10 +122,6 @@ public class Situation implements java.io.Serializable {
 
     public double getKillCountAllies() {
         return killCountAllies;
-    }
-
-    public double getNumberOfAllies() {
-        return numberOfAllies;
     }
 
     public double getNumberAlliesOnMap() {

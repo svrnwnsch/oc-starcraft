@@ -34,7 +34,7 @@ public class XCS {
 
     // XCS parameters taken from "An Algorithmic Description of XCS"
 
-    private int N = 1000;  // population Size  untested
+    private int N = 500;  // population Size  untested
     private double beta = 0.1;  // learning rate
     private double alpha = 0.1;
     private double epsilon0 = 1; // should be 1% of maximum predicted reward
@@ -49,7 +49,7 @@ public class XCS {
     public static double pInit = 0; // Predicted reward init
     public static double epsilonInit = 0; // prediction error init
     public static double FInit = 0; // Fitness init
-    private double pExplor = 0.2; // exploration probability
+    private double pExplor = 0.5; // exploration probability
     private int thetaMNA; // number of all possible Action
 
     private int timestep = 0;
@@ -121,15 +121,14 @@ public class XCS {
         }
 
         double curReward = actionDic.get(selectedActionId).executeAction(unit);
-        reward(unit, curReward);
         LOGGER.info("The action id was " + selectedActionId + " With current Reward: " + curReward);
         lastReward = curReward;
     }
 
     public void updateActionSets(double maxPrediction) {
-        for (int i = actionSets.size() - 1; i > 0; i--) {
+        for (int i = actionSets.size() - 2; i > 0; i--) {
             int j = actionSets.size() - i;
-            double reward = Math.pow(gamma, j) * (lastReward + gamma * maxPrediction);
+            double reward = Math.pow(gamma, j - 2) * (lastReward + gamma * maxPrediction);
             updateClassifier(reward, actionSets.get(i));
         }
 
@@ -199,14 +198,35 @@ public class XCS {
         predictionSet.values().removeIf(Objects::isNull); // remove all Actions where it is null
         int selectedActionId = -1;
         if (random.nextDouble() < pExplor) {
+            // do exploration
             List<Integer> aIds = new ArrayList<Integer>(predictionSet.keySet());
             selectedActionId = aIds.get(random.nextInt(aIds.size()));
         } else {
             double bestPrediction = Double.NEGATIVE_INFINITY;
+            double sumPositvPrediction = 0;
             for (int aId : predictionSet.keySet()) {
-                if (predictionSet.get(aId) > bestPrediction) {
+                double pred = predictionSet.get(aId);
+                if (pred > 0) {
+                    sumPositvPrediction += pred;
+                }
+                if (pred > bestPrediction) {
+                    // select action id with best prediction
                     bestPrediction = predictionSet.get(aId);
                     selectedActionId = aId;
+                }
+            }
+            if (sumPositvPrediction > 0) {
+                // at least some of the conditions predict positive reward
+                // choose action probable based on reward size
+                double threshold = random.nextDouble() * sumPositvPrediction;
+                for (int aId : predictionSet.keySet()) {
+                    double pred = predictionSet.get(aId);
+                    if (pred > 0) {
+                        sumPositvPrediction += pred;
+                    }
+                    if (sumPositvPrediction > threshold) {
+                        return selectedActionId;
+                    }
                 }
             }
         }

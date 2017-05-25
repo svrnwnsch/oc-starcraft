@@ -178,10 +178,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     @Override
     public void onUnitEvade(Unit unit) {
         // is also called when the unit get destroyed
-        if (unit.getPlayer() != this.self) {
-            xcs.reward(Rewards.EVADE_ENEMY);
-            LOGGER.warning("Loosing sight to unit");
-        }
+
     }
 
     @Override
@@ -194,6 +191,10 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
 
     @Override
     public void onUnitHide(Unit unit) {
+        if (unit.getPlayer() != this.self) {
+            xcs.reward(Rewards.HIDE_ENEMY);
+            LOGGER.warning("Loosing sight to unit");
+        }
     }
 
     @Override
