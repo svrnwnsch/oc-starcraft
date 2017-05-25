@@ -18,8 +18,7 @@ public class Classifier {
     }
 
     public boolean matchesSituation(Situation situation) {
-        condition.matchSituation(situation);
-        return false;
+        return condition.matchSituation(situation);
     }
 
     public int getActionId() {
@@ -51,4 +50,39 @@ public class Classifier {
         return prediction;
     }
 
+    public int getExp() {
+        return exp;
+    }
+
+    public void setExp(int exp) {
+        this.exp = exp;
+    }
+
+    public void setPrediction(double prediction) {
+        this.prediction = prediction;
+    }
+
+    public void setPredictionError(double predictionError) {
+        this.predictionError = predictionError;
+    }
+
+    public double getActionSetSize() {
+        return actionSetSize;
+    }
+
+    public void setActionSetSize(double actionSetSize) {
+        this.actionSetSize = actionSetSize;
+    }
+
+    public void setNumerosity(int numerosity) {
+        this.numerosity = numerosity;
+    }
+
+    public double vote(double avFitnessInPopulation) {
+        double vote = this.actionSetSize * this.numerosity;
+        if (exp > XCS.thetaDel && fitness / numerosity < XCS.delta * avFitnessInPopulation) {
+            vote = vote * avFitnessInPopulation / (fitness / numerosity);
+        }
+        return vote;
+    }
 }

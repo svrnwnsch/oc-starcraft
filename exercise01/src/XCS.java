@@ -3,6 +3,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Created by Severin Wünsch on 22.05.17.
@@ -14,6 +15,7 @@ import java.util.*;
 public class XCS {
     private Game game;
     private Random random = new Random();
+    private final static Logger LOGGER = Logger.getLogger(VultureAI.class.getName());
 
     private HashSet<Classifier> population; // population of all classifiers in XCS
     private HashSet<Classifier> matchSet; // match set for current environment
@@ -23,6 +25,8 @@ public class XCS {
     private HashSet<Classifier> lastActionSet; // action set of last action for delayed reward
 
     private HashMap<Integer, Action> actionDic;
+
+    private double lastReward = 0;
 
 
     // XCS parameters taken from "An Algorithmic Description of XCS"
@@ -36,8 +40,8 @@ public class XCS {
     private int thetaGA = 30;
     private double chi = 0.7; // crossover probabilities
     private double mu = 0.02; // mutation probability
-    private double thetaDel = 20; // deletion threshold
-    private double delta = 0.1;
+    public static final double thetaDel = 20; // deletion threshold
+    public static final double delta = 0.1;
     private double thetaSub = 20; // subsumption threshold
     public static double pInit = 0; // Predicted reward init
     public static double epsilonInit = 0; // prediction error init
@@ -49,10 +53,15 @@ public class XCS {
 
     public XCS(Game game) {
         this.game = game;
+        //LOGGER.setLevel(Level.CONFIG);
+        LOGGER.info("Initialising XCS");
         actionSet = new HashSet<Classifier>(); // initialize set
         matchSet = new HashSet<Classifier>();
-        population = new HashSet<>(N);
+        population = new HashSet<Classifier>();
+        LOGGER.info("Initialised HashSets");
+        actionDic = new HashMap<>();
         actionDic.put(0, new HoldAction()); // Do Nothing
+        LOGGER.info("Initialised HoldAction");
         actionDic.put(1, new MoveAction(this.game, 0)); // Move Right
         actionDic.put(2, new MoveAction(this.game, 45)); // Move Right Down
         actionDic.put(3, new MoveAction(this.game, 90)); // Move Down
@@ -61,13 +70,16 @@ public class XCS {
         actionDic.put(6, new MoveAction(this.game, 225)); // Move Left Up
         actionDic.put(7, new MoveAction(this.game, 270)); // Move Up
         actionDic.put(8, new MoveAction(this.game, 315)); // Move Right Up
+        LOGGER.info("Initialised MoveActions");
 
         // Generate Attack Closest Enemy for Each unit type listed in ReducedUnit.uniTypedMap
         for (UnitType unitType : ReducedUnit.unitTypeMap.keySet()) {
             actionDic.put(100 + ReducedUnit.unitTypeMap.get(unitType), new AttackClosestEnemyAction(unitType, this.game));
         }
+        LOGGER.info("Initialised Attack Closest Enemy actions");
 
         thetaMNA = actionDic.size();
+        LOGGER.info("Finished Initialising XCS");
     }
 
     public void step(Unit unit) {
@@ -77,14 +89,41 @@ public class XCS {
 
         // Shallow Copy of action set into last actions set
         timestep++;
+        LOGGER.config("Do xcs step");
         lastActionSet = (HashSet<Classifier>) actionSet.clone();
         // empty Matchset
         generateMatchSet(unit);
+        LOGGER.config("Generated Match set");
         int selectedActionId = selectActionId();
         generateActionSet(selectedActionId);
+        LOGGER.config("Generated Action Set " + lastActionSet.isEmpty());
 
-        reward(unit, actionDic.get(selectedActionId).executeAction(unit));
+        // Reward last action set based on the current predicted Reward
+        double reward = -1234567890;
+        if (!lastActionSet.isEmpty()) {
+            // calculate maximum predicted reward from current actionset
+            double maxPrediction = Double.NEGATIVE_INFINITY;
+            LOGGER.config("Updated Classifiers 1");
+            for (Classifier classifier : actionSet) {
+                if (classifier.getPrediction() > maxPrediction) {
+                    maxPrediction = classifier.getPrediction();
+                }
+            }
+            LOGGER.config("Updated Classifiers 2");
+            reward = lastReward + gamma * maxPrediction;
+            updateClassifier(reward, lastActionSet);
+            LOGGER.config("Updated Classifiers");
+        }
 
+        double curReward = actionDic.get(selectedActionId).executeAction(unit);
+        reward(unit, curReward);
+        LOGGER.info("The action id was " + selectedActionId + " With current Reward: " + curReward + " Last Reward: " + reward);
+        lastReward = curReward;
+    }
+
+    public void finnish() {
+        // Method for last Evaluation when game finished
+        updateClassifier(lastReward, actionSet);
     }
 
     private void generateMatchSet(Unit unit) {
@@ -104,7 +143,9 @@ public class XCS {
                 missingActionIds.removeAll(actionsId);
                 for (int i : missingActionIds) {
                     Classifier newClassifier = new Classifier(currentSituation, timestep);
+                    LOGGER.warning(population.size() + ": Created New Classifier with Action Id: " + i);
                     newClassifier.setActionId(i);
+                    population.add(newClassifier);
                 }
                 deleteFromPopulation();
                 matchSet.clear();
@@ -166,24 +207,59 @@ public class XCS {
         }
     }
 
-    public void updateFitness(HashSet<Classifier> actionSet) {
+    private void updateFitness(HashSet<Classifier> usedActionSet) {
         double accuracySum = 0;
         Map<Classifier, Double> kappa = new HashMap<Classifier, Double>();
-        for (Classifier cl : actionSet) {
+        for (Classifier cl : usedActionSet) {
             if (cl.getPredictionError() < epsilon0) {
                 kappa.put(cl, 1.);
             } else {
-                kappa.put(cl, alpha * Math.pow(cl.getPredictionError() / epsilon0, nu));
+                kappa.put(cl, alpha * Math.pow(cl.getPredictionError() / epsilon0, -nu));
             }
             accuracySum = accuracySum + kappa.get(cl) * cl.getNumerosisty();
         }
-        for (Classifier cl : actionSet) {
+        for (Classifier cl : usedActionSet) {
             cl.setFitness(cl.getFitness() + beta * (kappa.get(cl) * cl.getNumerosisty() / accuracySum - cl.getFitness()));
         }
     }
 
+    private void updateClassifier(double reward, HashSet<Classifier> usedActionSet) {
+        // This Method updates the last action classifiers based on the reward they got and the expected reward the will
+        // get from the current Action set (this is already calculated in die variable reward)
+
+        LOGGER.info("Updated set: " + usedActionSet + " with Reward: " + reward);
+        int sumNumerosity = 0;
+        for (Classifier cl : usedActionSet) {
+            sumNumerosity += cl.getNumerosisty();
+        }
+        for (Classifier cl : usedActionSet) {
+            cl.setExp(cl.getExp() + 1);
+            // Update prediction error
+            if (cl.getExp() < 1 / beta)
+                cl.setPredictionError(cl.getPredictionError() +
+                        (Math.abs(reward - cl.getPrediction()) - cl.getPredictionError()) / cl.getExp());
+            else
+                cl.setPredictionError(cl.getPredictionError() +
+                        beta * (Math.abs(reward - cl.getPrediction()) - cl.getPredictionError()));
+            // Update prediction for classifier
+            if (cl.getPrediction() < 1 / beta) {
+                cl.setPrediction(cl.getPrediction() + (reward - cl.getPrediction()) / cl.getExp());
+            } else
+                cl.setPrediction(cl.getPrediction() + beta * (reward - cl.getPrediction()));
+
+            // update action set size estimates cl.as
+            if (cl.getExp() < 1 / beta)
+                cl.setActionSetSize(cl.getActionSetSize() + (sumNumerosity - cl.getActionSetSize()) / cl.getExp());
+            else
+                cl.setActionSetSize(cl.getActionSetSize() + beta * (sumNumerosity - cl.getActionSetSize()));
+        }
+        updateFitness(usedActionSet);
+        // TODO: Implement action set subsumation (maybe GA is enough)
+    }
+
     public void reward(double reward) {
         // Function Adds the given reward to the action and lastActionSet for every unit
+        lastReward += reward; // add all Rewards to lastReward for next iteration
     }
 
     public void reward(Unit unit, double reward) {
@@ -192,9 +268,43 @@ public class XCS {
         reward(reward);
     }
 
-    public void deleteFromPopulation() {
+    private void deleteFromPopulation() {
         // Removes Conditions from the population until the size of the population is N
         // TODO: Implement Method
+        while (population.size() > N) {
+            LOGGER.warning("Population is full deleting a Classifier");
+
+            double totalFitness = 0;
+            int totalNumerosity = 0;
+            for (Classifier c : population) {
+                totalFitness += c.getFitness();
+                totalNumerosity += c.getNumerosisty();
+            }
+            double avFitnessInPopulation = totalFitness / totalNumerosity;
+            double voteSum = 0;
+            for (Classifier c : population) {
+                voteSum += c.vote(avFitnessInPopulation);
+            }
+            double choicepoint = random.nextDouble() * voteSum;
+            voteSum = 0;
+            for (Classifier c : population) {
+                voteSum += c.vote(avFitnessInPopulation);
+                if (voteSum > choicepoint) {
+                    if (c.getNumerosisty() > 1)
+                        c.setNumerosity(c.getNumerosisty() - 1);
+                    else
+                        population.remove(c);
+                    break;
+                }
+
+
+            }
+
+        }
+    }
+
+    public int getPopSize() {
+        return population.size();
     }
 
     public void loadXCS(String filename) {

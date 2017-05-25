@@ -21,13 +21,13 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
 
 
     public VultureAI() {
-        LOGGER.setLevel(Level.INFO);
+        LOGGER.setLevel(Level.WARNING);
 
         // Code so that console shows all logger events down to finer
         ConsoleHandler handler = new ConsoleHandler();
         // PUBLISH this level
         handler.setLevel(Level.FINER);
-        LOGGER.addHandler(handler);
+        //LOGGER.addHandler(handler);
 
         LOGGER.info("This is the VultureAI! :)");
         this.bwapi = new Mirror();
@@ -43,7 +43,8 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
         this.game = this.bwapi.getGame();
         this.self = game.self();
         this.frame = 0;
-        xcs = new XCS(game);
+        if (xcs == null)
+            xcs = new XCS(game);
         // complete map information
         this.game.enableFlag(0);
         
@@ -56,24 +57,29 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     public void onFrame() {
 
         //LOGGER.info("blabla");
-        vulture.step();
-        if (frame % 100 == 0) {
-            List<Unit> allUnits = game.getAllUnits();
-            //LOGGER.info("size of all Units:" + allUnits.size());
-            for(Unit unit : allUnits){
+        //vulture.step();
+        List<Unit> allUnits = game.getAllUnits();
+        //LOGGER.info("size of all Units:" + allUnits.size());
+        if (frame % 1 == 0) {
+            // execute xcs only every second frame
+
+            for (Unit unit : allUnits) {
                 //LOGGER.info("size of all Units:" + allUnits.size());
                 //LOGGER.info(unit);
 
                 //LOGGER.info(unit.getPlayer());
-                if(unit.getPlayer() == this.self){
-                    //LOGGER.info("Unit is the from player" + unit.getPlayer());
-                    alliedUnits.add(unit);
+                if (unit.getPlayer() == this.self && unit.getType() == UnitType.Terran_Vulture) {
+                    LOGGER.fine("Unit is the from player" + unit.getPlayer());
+                    xcs.step(unit);
+                    /*
                     Situation situation = new Situation(unit, game);
                     LOGGER.config("Enemy Units:" + situation.getNumberSightedEnemiesOnMap());
                     LOGGER.config("Allied Units:" + situation.getNumberAlliesOnMap());
+                    */
 
                 }
             }
+
 
         }
         frame++;
@@ -110,6 +116,8 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
             xcs.reward(Rewards.WIN_GAME);
         else
             xcs.reward(Rewards.LOSE_GAME);
+        LOGGER.warning("Game Ended did we win? " + winner + " Number of Classifiers: " + xcs.getPopSize());
+        xcs.finnish();
     }
 
     @Override

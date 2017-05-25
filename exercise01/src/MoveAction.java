@@ -3,11 +3,14 @@ import bwapi.Position;
 import bwapi.Region;
 import bwapi.Unit;
 
+import java.util.logging.Logger;
+
 
 /**
  * Created by OC2 on 23.05.2017.
  */
 public class MoveAction implements Action {
+    private final static Logger LOGGER = Logger.getLogger(VultureAI.class.getName());
 
     // moveAngle should be in Radians
     private double moveAngle;
@@ -23,13 +26,12 @@ public class MoveAction implements Action {
     @Override
     public double executeAction(Unit executingUnit) {
         if (!executingUnit.canMove()) {
+            LOGGER.info("Unit cannot Move");
             return Rewards.ILLEGAL_MOVE;
         }
         Position position = executingUnit.getPosition();
-        System.out.println("current position: " + position);
         Position newPosition = new Position(position.getX() + (int) (moveRadius * Math.cos(moveAngle)),
                 position.getY() + (int) (moveRadius * Math.sin(moveAngle)));
-        System.out.println("move to: " + newPosition);
 
         if (executingUnit.move(newPosition)) {
 
