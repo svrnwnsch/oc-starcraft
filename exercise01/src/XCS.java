@@ -3,6 +3,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
@@ -22,7 +23,8 @@ public class XCS {
     private Game game;
     private Random random = new Random();
     private final static Logger LOGGER = Logger.getLogger(VultureAI.class.getName());
-    public static String fileName = "data\\xcs.ser";
+    public static String fileDirectory = "data";
+    public static String fileName = fileDirectory + "\\xcs.ser";
 
     private HashSet<Classifier> population; // population of all classifiers in XCS
     private HashSet<Classifier> matchSet; // match set for current environment
@@ -343,6 +345,9 @@ public class XCS {
 
     public void saveXCS(String filename) {
         try {
+            if (!new File(fileDirectory).exists()) {
+                new File(fileDirectory).mkdirs();
+            }
             System.out.println("Saving XCS-file");
             FileOutputStream fileOut = new FileOutputStream(filename);
             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
