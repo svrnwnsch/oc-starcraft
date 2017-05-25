@@ -21,7 +21,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     private HashMap<Unit, Integer> friendlyUnitHealth = new HashMap<>();
     private int wonGames = 0;
     private int lostGames = 0;
-    private boolean loadGame = false;
+    private boolean loadGame = true;
 
 
     public VultureAI() {
@@ -177,6 +177,11 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
 
     @Override
     public void onUnitEvade(Unit unit) {
+        // is also called when the unit get destroyed
+        if (unit.getPlayer() != this.self) {
+            xcs.reward(Rewards.EVADE_ENEMY);
+            LOGGER.warning("Loosing sight to unit");
+        }
     }
 
     @Override

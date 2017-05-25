@@ -19,14 +19,13 @@ public class XCS {
     private Random random = new Random();
     private final static Logger LOGGER = Logger.getLogger(VultureAI.class.getName());
     public static String fileDirectory = "data";
-    public static String fileName = fileDirectory + "\\xcs1.ser";
+    public static String fileName = fileDirectory + "\\xcs2.ser";
 
     private HashSet<Classifier> population; // population of all classifiers in XCS
     private HashSet<Classifier> matchSet; // match set for current environment
 
     //TODO: replace two step reward with multistep reward an queue of fixed last k action sets
-    private HashSet<Classifier> actionSet; // action set of all classifiers
-    private HashSet<Classifier> lastActionSet; // action set of last action for delayed reward
+    private LinkedList<HashSet> actionSets;
 
     private HashMap<Integer, Action> actionDic;
 
@@ -40,7 +39,7 @@ public class XCS {
     private double alpha = 0.1;
     private double epsilon0 = 1; // should be 1% of maximum predicted reward
     private double nu = 5; // power parameter
-    private double gamma = 0.71; // discount factor
+    private double gamma = 0.8; // discount factor
     private int thetaGA = 30;
     private double chi = 0.7; // crossover probabilities
     private double mu = 0.02; // mutation probability
@@ -54,12 +53,13 @@ public class XCS {
     private int thetaMNA; // number of all possible Action
 
     private int timestep = 0;
+    private static int MULTI_STEP_REWARD_LENGTH = 20;
 
     public XCS(Game game) {
         this.game = game;
         //LOGGER.setLevel(Level.CONFIG);
         LOGGER.info("Initialising XCS");
-        actionSet = new HashSet<Classifier>(); // initialize set
+        actionSets = new LinkedList<>();
         matchSet = new HashSet<Classifier>();
         population = new HashSet<Classifier>();
         LOGGER.info("Initialised HashSets");
@@ -94,40 +94,52 @@ public class XCS {
         // Shallow Copy of action set into last actions set
         timestep++;
         LOGGER.config("Do xcs step");
-        lastActionSet = (HashSet<Classifier>) actionSet.clone();
+        //lastActionSet = (HashSet<Classifier>) actionSet.clone();
         // empty Matchset
         generateMatchSet(unit);
         LOGGER.config("Generated Match set");
         int selectedActionId = selectActionId();
         generateActionSet(selectedActionId);
-        LOGGER.config("Generated Action Set " + lastActionSet.isEmpty());
+        while (actionSets.size() > MULTI_STEP_REWARD_LENGTH) { //remove oldest action Sets form queue
+            actionSets.pollFirst();
+        }
+        LOGGER.config("Generated Action Set " + actionSets.size());
 
-        // Reward last action set based on the current predicted Reward
-        double reward = -1234567890;
-        if (!lastActionSet.isEmpty()) {
+        // Reward last action sets based on the current predicted Reward
+        if (actionSets.size() > 1) {
             // calculate maximum predicted reward from current actionset
             double maxPrediction = Double.NEGATIVE_INFINITY;
             LOGGER.config("Updated Classifiers 1");
-            for (Classifier classifier : actionSet) {
+            for (Classifier classifier : (HashSet<Classifier>) actionSets.peekLast()) {
                 if (classifier.getPrediction() > maxPrediction) {
                     maxPrediction = classifier.getPrediction();
                 }
             }
             LOGGER.config("Updated Classifiers 2");
-            reward = lastReward + gamma * maxPrediction;
-            updateClassifier(reward, lastActionSet);
+            updateActionSets(maxPrediction);
             LOGGER.config("Updated Classifiers");
         }
 
         double curReward = actionDic.get(selectedActionId).executeAction(unit);
         reward(unit, curReward);
-        LOGGER.info("The action id was " + selectedActionId + " With current Reward: " + curReward + " Last Reward: " + reward);
+        LOGGER.info("The action id was " + selectedActionId + " With current Reward: " + curReward);
         lastReward = curReward;
+    }
+
+    public void updateActionSets(double maxPrediction) {
+        for (int i = actionSets.size() - 1; i > 0; i--) {
+            int j = actionSets.size() - i;
+            double reward = Math.pow(gamma, j) * (lastReward + gamma * maxPrediction);
+            updateClassifier(reward, actionSets.get(i));
+        }
+
     }
 
     public void finnish() {
         // Method for last Evaluation when game finished
-        updateClassifier(lastReward, actionSet);
+        actionSets.add(new HashSet<Classifier>()); // add empty HashSet to as there is no Action Set in this last Step
+        updateActionSets(0);
+        actionSets.clear(); // empty all saved action sets
         saveXCS(fileName);
     }
 
@@ -204,12 +216,13 @@ public class XCS {
 
     // updates the actionSet based on the current match set and the selectedActionId
     private void generateActionSet(int selectedActionId) {
-        actionSet.clear();
+        HashSet<Classifier> actionSet = new HashSet<Classifier>();
         for (Classifier classifier : matchSet) {
             if (classifier.getActionId() == selectedActionId) {
                 actionSet.add(classifier);
             }
         }
+        actionSets.add(actionSet);
     }
 
     private void updateFitness(HashSet<Classifier> usedActionSet) {
@@ -247,7 +260,7 @@ public class XCS {
                 cl.setPredictionError(cl.getPredictionError() +
                         beta * (Math.abs(reward - cl.getPrediction()) - cl.getPredictionError()));
             // Update prediction for classifier
-            if (cl.getPrediction() < 1 / beta) {
+            if (cl.getExp() < 1 / beta) {
                 cl.setPrediction(cl.getPrediction() + (reward - cl.getPrediction()) / cl.getExp());
             } else
                 cl.setPrediction(cl.getPrediction() + beta * (reward - cl.getPrediction()));
