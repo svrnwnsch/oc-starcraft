@@ -4,6 +4,14 @@ import bwapi.UnitType;
 
 import java.util.*;
 import java.util.logging.Logger;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.TreeSet;
 
 /**
  * Created by Severin Wünsch on 22.05.17.
@@ -309,11 +317,38 @@ public class XCS {
     }
 
     public void loadXCS(String filename) {
+        population = new HashSet<Classifier>();
+        try {
+            FileInputStream fileIn = new FileInputStream(filename);
+            ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+            Classifier cl = null;
+            while ((cl = (Classifier) objectIn.readObject()) != null) {
+                population.add(cl);
+            }
+            objectIn.close();
+            fileIn.close();
+        } catch (Exception e) {
+            System.out.println("File Loading Error");
+            e.printStackTrace();
+        }
         // Loads a XCS from a given filename
         // TODO: Implement Loading functionality
     }
 
     public void saveXCS(String filename) {
+        try {
+            FileOutputStream fileOut = new FileOutputStream(filename);
+            ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+            for (Classifier cl : population) {
+                objectOut.writeObject(cl);
+            }
+            objectOut.close();
+            fileOut.close();
+            System.out.println("Population has been saved under: " + filename);
+        } catch (Exception e) {
+            System.out.println("File Saving Error!");
+            e.printStackTrace();
+        }
         // Serializes the XCS into a file in filename
         // TODO: Implement Save functionality
     }

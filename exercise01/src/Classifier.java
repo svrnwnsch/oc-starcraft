@@ -1,7 +1,7 @@
 /**
  * Created by Severin Wünsch on 22.05.17.
  */
-public class Classifier {
+public class Classifier implements java.io.Serializable {
     private Condition condition;
     private int actionId;
     private double prediction = XCS.pInit;

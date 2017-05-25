@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created by Severin Wünsch on 22.05.17.
  */
-public class ReducedUnit {
+public class ReducedUnit implements java.io.Serializable {
     //public static String bla = "bla";
     public static final Map<UnitType, Integer> unitTypeMap = createMap();
 
