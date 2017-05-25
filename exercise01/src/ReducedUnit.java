@@ -26,10 +26,10 @@ public class ReducedUnit implements java.io.Serializable {
     public double unitType = 1.;
 
     public void printReducedUnit() {
-        System.out.print("\tnormeddistance" + normedDistance);
-        System.out.print("\tnormedangle" + normedAngle);
-        System.out.print("\tnormedHitpoints" + normedHitPoints);
-        System.out.print("\tunittype" + unitType);
+        System.out.print("\tnormeddistance " + normedDistance);
+        System.out.print("\tnormedangle " + normedAngle);
+        System.out.print("\tnormedHitpoints " + normedHitPoints);
+        System.out.print("\tunittype " + unitType);
     }
 
     public ReducedUnit(){
@@ -38,13 +38,13 @@ public class ReducedUnit implements java.io.Serializable {
 
     public ReducedUnit(Unit unit, Position position){
         this.normedHitPoints = ConditionUtil.parseValue(unit.getHitPoints(), unit.getType().maxHitPoints());
-        this.normedDistance = ((double) position.getDistance(unit.getPosition())) / Situation.maxDistance;
+        this.normedDistance = Math.exp(-position.getDistance(unit.getPosition()) / 100);
         this.normedAngle = calculateAngle(position, unit.getPosition());
         this.unitType = ((double) unitTypeMap.get(unit.getType())) / 100;
     }
 
     public double calculateAngle(Position centerPosition, Position relativePosition){
-        return Math.atan2((double) (relativePosition.getY() - centerPosition.getY()), (double) (relativePosition.getX() - centerPosition.getX())) + Math.PI;
+        return (Math.atan2((double) (relativePosition.getY() - centerPosition.getY()), (double) (relativePosition.getX() - centerPosition.getX())) + Math.PI) / (20 * Math.PI);
     }
 
     /*public static double distance(Position position1, Position position2){

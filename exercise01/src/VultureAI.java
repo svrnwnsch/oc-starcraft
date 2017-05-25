@@ -22,6 +22,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     private int wonGames = 0;
     private int lostGames = 0;
     private boolean loadGame = true;
+    private boolean saveGame = true;
 
 
     public VultureAI() {
@@ -157,6 +158,9 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
         LOGGER.warning("Game Ended did we win? " + winner + " Number of Classifiers: " + xcs.getPopSize()
                 + " Number of games won: " + wonGames + " Number of games lost: " + lostGames);
         xcs.finnish();
+        if (saveGame) {
+            xcs.saveXCS(XCS.fileName);
+        }
     }
 
     @Override

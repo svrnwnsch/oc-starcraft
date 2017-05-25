@@ -4,7 +4,7 @@ import java.util.Random;
  * Created by Severin Wünsch on 22.05.17.
  */
 public class Condition implements java.io.Serializable {
-    public static final double sigma = 1. / 5.;
+    public static final double sigma = 1. / 10.;
 
     public Situation situation;
 

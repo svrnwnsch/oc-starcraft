@@ -16,7 +16,7 @@ public class Rewards {
     public static final int HIDE_ENEMY = -15;
     public static final int CANNOT_ATTACK = -10;
     public static final int DESTROYED_ALLY = -100;
-    public static final int LOSE_GAME = -1000;
+    public static final int LOSE_GAME = -100;
 
 
 

@@ -34,7 +34,7 @@ public class XCS {
 
     // XCS parameters taken from "An Algorithmic Description of XCS"
 
-    private int N = 500;  // population Size  untested
+    private int N = 200;  // population Size  untested
     private double beta = 0.1;  // learning rate
     private double alpha = 0.1;
     private double epsilon0 = 1; // should be 1% of maximum predicted reward
@@ -49,11 +49,15 @@ public class XCS {
     public static double pInit = 0; // Predicted reward init
     public static double epsilonInit = 0; // prediction error init
     public static double FInit = 0; // Fitness init
-    private double pExplor = 0.5; // exploration probability
+    private double pExplor = 0.2; // exploration probability
     private int thetaMNA; // number of all possible Action
 
     private int timestep = 0;
     private static int MULTI_STEP_REWARD_LENGTH = 20;
+
+    public XCS() {
+        // only used to print population
+    }
 
     public XCS(Game game) {
         this.game = game;
@@ -139,7 +143,6 @@ public class XCS {
         actionSets.add(new HashSet<Classifier>()); // add empty HashSet to as there is no Action Set in this last Step
         updateActionSets(0);
         actionSets.clear(); // empty all saved action sets
-        saveXCS(fileName);
     }
 
     private void generateMatchSet(Unit unit) {
@@ -372,6 +375,7 @@ public class XCS {
     }
 
     public void saveXCS(String filename) {
+        // Serializes the XCS into a file in filename
         try {
             if (!new File(fileDirectory).exists()) {
                 new File(fileDirectory).mkdirs();
@@ -381,7 +385,6 @@ public class XCS {
             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
             for (Classifier cl : population) {
                 objectOut.writeObject(cl);
-                cl.printClassifier();
             }
             objectOut.close();
             fileOut.close();
@@ -392,7 +395,13 @@ public class XCS {
             e.printStackTrace();
 
         }
-        // Serializes the XCS into a file in filename
-        // TODO: Implement Save functionality
+
+
+    }
+
+    public void printClassifiers() {
+        for (Classifier cl : population) {
+            cl.printClassifier();
+        }
     }
 }
