@@ -1,11 +1,3 @@
-import bwapi.Position;
-import bwapi.Unit;
-import bwapi.UnitType;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
 /**
  * Created by Severin Wünsch on 22.05.17.
  */
@@ -31,11 +23,11 @@ public class ReducedUnitInterval implements java.io.Serializable {
         this.unitTypeInterval = unitTypeInterval;
     }
 
-    public ReducedUnitInterval(Random random){
-        normedDistanceInterval = Math.abs(random.nextGaussian()*Condition.sigma);
-        normedAngleInterval = Math.abs(random.nextGaussian()*Condition.sigma);
-        normedHitPointsInterval = Math.abs(random.nextGaussian()*Condition.sigma);
-        unitTypeInterval = Math.abs(random.nextGaussian()*Condition.sigma);
+    public ReducedUnitInterval() {
+        normedDistanceInterval = Math.abs(Condition.getRandomInterval());
+        normedAngleInterval = Math.abs(Condition.getRandomInterval());
+        normedHitPointsInterval = Math.abs(Condition.getRandomInterval());
+        unitTypeInterval = Math.abs(Condition.getRandomInterval());
 
     }
 

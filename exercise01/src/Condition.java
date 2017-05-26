@@ -5,6 +5,8 @@ import java.util.Random;
  */
 public class Condition implements java.io.Serializable {
     public static final double sigma = 1. / 10.;
+    // probability to set Interval to 1
+    public static final double pIntervalOne = 0.1;
 
     public Situation situation;
 
@@ -21,6 +23,8 @@ public class Condition implements java.io.Serializable {
 
     public ArrayList<ReducedUnitInterval> closestEnemiesInterval;
     public ArrayList<ReducedUnitInterval> closestAlliesInterval;
+
+    private static Random random = new Random();
 
     public void printCondition() {
         System.out.print("\tunitHitInterval: " + unitHitPointsInterval);
@@ -40,31 +44,40 @@ public class Condition implements java.io.Serializable {
     public Condition(Situation situation){
         this.situation = situation;
 
-        Random random = new Random();
-        unitHitPointsInterval = Math.abs(random.nextGaussian()*sigma);
-        unitPosXInterval = Math.abs(random.nextGaussian()*sigma);
-        unitPosYInterval = Math.abs(random.nextGaussian()*sigma);
-        unitGroundCooldownInterval = Math.abs(random.nextGaussian()*sigma);
-        numberAlliesOnMapInterval = Math.abs(random.nextGaussian()*sigma);
-        numberEnemiesOnMapInterval = Math.abs(random.nextGaussian()*sigma);
-        numberSightedEnemiesOnMapInterval = Math.abs(random.nextGaussian()*sigma);
-        killCountAlliesInterval = Math.abs(random.nextGaussian()*sigma);
-        killCountEnemiesInterval = Math.abs(random.nextGaussian()*sigma);
+
+        unitHitPointsInterval = Math.abs(getRandomInterval());
+        unitPosXInterval = Math.abs(getRandomInterval());
+        unitPosYInterval = Math.abs(getRandomInterval());
+        unitGroundCooldownInterval = Math.abs(getRandomInterval());
+        numberAlliesOnMapInterval = Math.abs(getRandomInterval());
+        numberEnemiesOnMapInterval = Math.abs(getRandomInterval());
+        numberSightedEnemiesOnMapInterval = Math.abs(getRandomInterval());
+        killCountAlliesInterval = Math.abs(getRandomInterval());
+        killCountEnemiesInterval = Math.abs(getRandomInterval());
         closestAlliesInterval = new ArrayList<ReducedUnitInterval>(Situation.closestAlliesArraySize);
         for(int i=0; i<Situation.closestAlliesArraySize; i++){
-            closestAlliesInterval.add(i, new ReducedUnitInterval(random));
+            closestAlliesInterval.add(i, new ReducedUnitInterval());
         }
         closestEnemiesInterval = new ArrayList<ReducedUnitInterval>(Situation.closestEnemiesArraySize);
         for(int i=0; i<Situation.closestEnemiesArraySize; i++){
-            closestEnemiesInterval.add(i, new ReducedUnitInterval(random));
+            closestEnemiesInterval.add(i, new ReducedUnitInterval());
         }
 
     }
 
+    public static double getRandomInterval() {
+
+        if (random.nextDouble() < pIntervalOne) {
+            return 1.;
+        } else {
+            return Math.abs(random.nextGaussian() * sigma);
+        }
+    }
+
     public boolean matchSituation(Situation externSituation){
         boolean result = (matchVariable(externSituation.getUnitHitpoints(), situation.getUnitHitpoints(), unitHitPointsInterval)) &&
-                (matchVariable(externSituation.getUnitPosX(), situation.getUnitPosX(), unitPosXInterval)) &&
-                (matchVariable(externSituation.getUnitPosY(), situation.getUnitPosY(), unitPosYInterval)) &&
+                //(matchVariable(externSituation.getUnitPosX(), situation.getUnitPosX(), unitPosXInterval)) &&
+                //(matchVariable(externSituation.getUnitPosY(), situation.getUnitPosY(), unitPosYInterval)) &&
                 (matchVariable(externSituation.getUnitGroundCooldown(), situation.getUnitGroundCooldown(), unitGroundCooldownInterval)) &&
                 (matchVariable(externSituation.getNumberAlliesOnMap(), situation.getNumberAlliesOnMap(), numberAlliesOnMapInterval)) &&
                 (matchVariable(externSituation.getNumberSightedEnemiesOnMap(), situation.getNumberSightedEnemiesOnMap(), numberSightedEnemiesOnMapInterval)) &&
