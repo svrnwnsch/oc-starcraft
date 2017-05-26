@@ -19,7 +19,7 @@ public class XCS {
     private Random random = new Random();
     private final static Logger LOGGER = Logger.getLogger(VultureAI.class.getName());
     public static String fileDirectory = "data";
-    public static String fileName = fileDirectory + "\\xcs2.ser";
+    public static String fileName = fileDirectory + "\\xcs3.ser";
 
     private HashSet<Classifier> population; // population of all classifiers in XCS
     private HashSet<Classifier> matchSet; // match set for current environment
@@ -34,12 +34,12 @@ public class XCS {
 
     // XCS parameters taken from "An Algorithmic Description of XCS"
 
-    private int N = 200;  // population Size  untested
+    private int N = 500;  // population Size  untested
     private double beta = 0.1;  // learning rate
     private double alpha = 0.1;
     private double epsilon0 = 1; // should be 1% of maximum predicted reward
     private double nu = 5; // power parameter
-    private double gamma = 0.8; // discount factor
+    private double gamma = 0.75; // discount factor
     private int thetaGA = 30;
     private double chi = 0.7; // crossover probabilities
     private double mu = 0.02; // mutation probability
@@ -72,11 +72,11 @@ public class XCS {
         LOGGER.info("Initialised HoldAction");
         actionDic.put(1, new MoveAction(this.game, 0)); // Move Right
         //actionDic.put(2, new MoveAction(this.game, 45)); // Move Right Down
-        //actionDic.put(3, new MoveAction(this.game, 90)); // Move Down
+        actionDic.put(3, new MoveAction(this.game, 90)); // Move Down
         //actionDic.put(4, new MoveAction(this.game, 135)); // Move Left Down
         actionDic.put(5, new MoveAction(this.game, 180)); // Move Left
         //actionDic.put(6, new MoveAction(this.game, 225)); // Move Left Up
-        //actionDic.put(7, new MoveAction(this.game, 270)); // Move Up
+        actionDic.put(7, new MoveAction(this.game, 270)); // Move Up
         //actionDic.put(8, new MoveAction(this.game, 315)); // Move Right Up
         LOGGER.info("Initialised MoveActions");
 
@@ -197,13 +197,14 @@ public class XCS {
             }
         }
 
-        // TODO: Select action probability based on prediction array and not only best
         predictionSet.values().removeIf(Objects::isNull); // remove all Actions where it is null
         int selectedActionId = -1;
-        if (random.nextDouble() < pExplor) {
+        // reduce over time the expolration to 1% of original Expolration
+        if (random.nextDouble() < (pExplor - 0.99 * pExplor * Math.exp(-100000. / timestep))) {
             // do exploration
             List<Integer> aIds = new ArrayList<Integer>(predictionSet.keySet());
             selectedActionId = aIds.get(random.nextInt(aIds.size()));
+            System.out.println("Do expolration " + timestep);
         } else {
             double bestPrediction = Double.NEGATIVE_INFINITY;
             double sumPositvPrediction = 0;
@@ -356,6 +357,7 @@ public class XCS {
             ObjectInputStream objectIn = new ObjectInputStream(fileIn);
             Classifier cl = null;
             try {
+                timestep = (Integer) objectIn.readObject();
                 while ((cl = (Classifier) objectIn.readObject()) != null) {
                     population.add(cl);
                 }
@@ -383,6 +385,7 @@ public class XCS {
             LOGGER.config("Saving XCS-file");
             FileOutputStream fileOut = new FileOutputStream(filename);
             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+            objectOut.writeObject(timestep); // always save timestep first
             for (Classifier cl : population) {
                 objectOut.writeObject(cl);
             }
