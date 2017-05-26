@@ -11,14 +11,14 @@ import java.util.List;
 public class Situation implements java.io.Serializable {
 
     public static final int closestAlliesArraySize = 0;
-    public static final int closestEnemiesArraySize = 2;
-    public static final int maxUnits = 100;
+    public static final int closestEnemiesArraySize = 5;
+    public static final int maxUnits = 10;
     //manually determined for current map(Karte-Aufgabe4_v1.scx)
     public static final int maxPosX = 5000;
     public static final int maxPosY = 4000;
-    public static final int maxGroundCooldown = 1000;
+    public static final int maxGroundCooldown = 100;
     public static final double maxDistance = Math.sqrt(maxPosX * maxPosX + maxPosY * maxPosY);
-    public static final int maxPossibleHP = 5000;
+    public static final int maxPossibleHP = 1000;
     // TODO: update if we have buildings
 
 
