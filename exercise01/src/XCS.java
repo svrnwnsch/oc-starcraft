@@ -26,6 +26,7 @@ public class XCS {
 
     //TODO: replace two step reward with multistep reward an queue of fixed last k action sets
     private LinkedList<HashSet> actionSets;
+    private ArrayList<HashSet<Classifier>> allActionSets;
 
     private HashMap<Integer, Action> actionDic;
 
@@ -34,12 +35,12 @@ public class XCS {
 
     // XCS parameters taken from "An Algorithmic Description of XCS"
 
-    private int N = 500;  // population Size  untested
+    private int N = 5000;  // population Size  untested
     private double beta = 0.1;  // learning rate
     private double alpha = 0.1;
     private double epsilon0 = 1; // should be 1% of maximum predicted reward
     private double nu = 5; // power parameter
-    private double gamma = 0.75; // discount factor
+    private double gamma = 0.9; // discount factor
     private int thetaGA = 30;
     private double chi = 0.7; // crossover probabilities
     private double mu = 0.02; // mutation probability
@@ -53,7 +54,7 @@ public class XCS {
     private int thetaMNA; // number of all possible Action
 
     private int timestep = 0;
-    private static int MULTI_STEP_REWARD_LENGTH = 20;
+    private static int MULTI_STEP_REWARD_LENGTH = 40;
 
     public XCS() {
         // only used to print population
@@ -66,17 +67,18 @@ public class XCS {
         actionSets = new LinkedList<>();
         matchSet = new HashSet<Classifier>();
         population = new HashSet<Classifier>();
+        allActionSets = new ArrayList<>();
         LOGGER.info("Initialised HashSets");
         actionDic = new HashMap<>();
         actionDic.put(0, new HoldAction()); // Do Nothing
         LOGGER.info("Initialised HoldAction");
         actionDic.put(1, new MoveAction(this.game, 0)); // Move Right
         //actionDic.put(2, new MoveAction(this.game, 45)); // Move Right Down
-        actionDic.put(3, new MoveAction(this.game, 90)); // Move Down
+        //actionDic.put(3, new MoveAction(this.game, 90)); // Move Down
         //actionDic.put(4, new MoveAction(this.game, 135)); // Move Left Down
         actionDic.put(5, new MoveAction(this.game, 180)); // Move Left
         //actionDic.put(6, new MoveAction(this.game, 225)); // Move Left Up
-        actionDic.put(7, new MoveAction(this.game, 270)); // Move Up
+        //actionDic.put(7, new MoveAction(this.game, 270)); // Move Up
         //actionDic.put(8, new MoveAction(this.game, 315)); // Move Right Up
         LOGGER.info("Initialised MoveActions");
 
@@ -143,6 +145,7 @@ public class XCS {
         actionSets.add(new HashSet<Classifier>()); // add empty HashSet to as there is no Action Set in this last Step
         updateActionSets(0);
         actionSets.clear(); // empty all saved action sets
+        allActionSets.clear();
     }
 
     private void generateMatchSet(Unit unit) {
@@ -229,7 +232,7 @@ public class XCS {
                         sumPositvPrediction += pred;
                     }
                     if (sumPositvPrediction > threshold) {
-                        return selectedActionId;
+                        return aId;
                     }
                 }
             }
@@ -247,6 +250,7 @@ public class XCS {
             }
         }
         actionSets.add(actionSet);
+        allActionSets.add(actionSet);
     }
 
     private void updateFitness(HashSet<Classifier> usedActionSet) {
@@ -308,6 +312,17 @@ public class XCS {
         // Function adds the given reward to the action and lastActionSet for the specific unit
         // TODO: Implement specific Reward method
         reward(reward);
+    }
+
+    // Rewards all Actionsets in the current game
+    // The lastReward gets distributed between all Actionsets if fixed is false
+    public void rewardAllActionSets(double reward, boolean fixed) {
+        if (!fixed)
+            reward = reward / allActionSets.size();
+        LOGGER.warning("Rewarded all actions with: " + reward);
+        for (HashSet<Classifier> set : allActionSets) {
+            updateClassifier(reward, set);
+        }
     }
 
     private void deleteFromPopulation() {
