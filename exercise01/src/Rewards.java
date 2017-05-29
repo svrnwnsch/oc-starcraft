@@ -5,19 +5,19 @@
  */
 public class Rewards {
     // Positive Rewards
-    public static final double LEGAL_MOVE = 0.01;
+    public static final double LEGAL_MOVE = 0.1;
     public static final int DESTROY_ENEMY = 500;
     public static final int FIND_UNIT = 10;
     public static final int WIN_GAME = 1000;
 
 
     // Negative Rewards
-    public static final double HOLD = -0.01;
+    public static final double HOLD = -0.5;
     public static final int ILLEGAL_MOVE = -1;
     public static final int HIDE_ENEMY = -15;
     public static final int CANNOT_ATTACK = -10;
-    public static final int DESTROYED_ALLY = -100;
-    public static final int LOSE_GAME = -100;
+    public static final int DESTROYED_ALLY = -10;
+    public static final int LOSE_GAME = -10;
     public static final double LOSE_GAME_STEP = -0.1;
 
 

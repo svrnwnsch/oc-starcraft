@@ -25,10 +25,14 @@ public class XCS {
     private HashSet<Classifier> matchSet; // match set for current environment
 
     //TODO: replace two step reward with multistep reward an queue of fixed last k action sets
-    private LinkedList<HashSet> actionSets;
+    private LinkedList<AbstractMap.SimpleEntry<HashSet, Double>> actionSets;
     private ArrayList<HashSet<Classifier>> allActionSets;
 
     private HashMap<Integer, Action> actionDic;
+
+    private final Object actionSetsLock = new Object();
+    private final Object allActionSetsLock = new Object();
+    private final Object lastRewardLock = new Object();
 
     private double lastReward = 0;
 
@@ -40,7 +44,7 @@ public class XCS {
     private double alpha = 0.1;
     private double epsilon0 = 1; // should be 1% of maximum predicted reward
     private double nu = 5; // power parameter
-    private double gamma = 0.9; // discount factor
+    private double gamma = 0.8; // discount factor
     private int thetaGA = 30;
     private double chi = 0.7; // crossover probabilities
     private double mu = 0.02; // mutation probability
@@ -54,7 +58,7 @@ public class XCS {
     private int thetaMNA; // number of all possible Action
 
     private int timestep = 0;
-    private static int MULTI_STEP_REWARD_LENGTH = 40;
+    private static int MULTI_STEP_REWARD_LENGTH = 30;
 
     public XCS() {
         // only used to print population
@@ -106,8 +110,11 @@ public class XCS {
         LOGGER.config("Generated Match set");
         int selectedActionId = selectActionId();
         generateActionSet(selectedActionId);
-        while (actionSets.size() > MULTI_STEP_REWARD_LENGTH) { //remove oldest action Sets form queue
-            actionSets.pollFirst();
+        synchronized (actionSetsLock) {
+            while (actionSets.size() > MULTI_STEP_REWARD_LENGTH) { //remove oldest action Sets form queue
+                AbstractMap.SimpleEntry<HashSet, Double> actionSet = actionSets.pollFirst();
+                updateClassifier(actionSet.getValue(), actionSet.getKey());
+            }
         }
         LOGGER.config("Generated Action Set " + actionSets.size());
 
@@ -116,36 +123,67 @@ public class XCS {
             // calculate maximum predicted reward from current actionset
             double maxPrediction = Double.NEGATIVE_INFINITY;
             LOGGER.config("Updated Classifiers 1");
-            for (Classifier classifier : (HashSet<Classifier>) actionSets.peekLast()) {
-                if (classifier.getPrediction() > maxPrediction) {
-                    maxPrediction = classifier.getPrediction();
+            synchronized (actionSetsLock) {
+                for (Classifier classifier : (HashSet<Classifier>) actionSets.peekLast().getKey()) {
+                    if (classifier.getPrediction() > maxPrediction) {
+                        maxPrediction = classifier.getPrediction();
+                    }
                 }
+
+                LOGGER.config("Updated Classifiers 2");
+                updateActionSets(maxPrediction);
             }
-            LOGGER.config("Updated Classifiers 2");
-            updateActionSets(maxPrediction);
             LOGGER.config("Updated Classifiers");
         }
 
         double curReward = actionDic.get(selectedActionId).executeAction(unit);
         LOGGER.info("The action id was " + selectedActionId + " With current Reward: " + curReward);
-        lastReward = curReward;
+        synchronized (lastRewardLock) {
+            lastReward = curReward;
+        }
     }
 
-    public void updateActionSets(double maxPrediction) {
-        for (int i = actionSets.size() - 2; i > 0; i--) {
-            int j = actionSets.size() - i;
-            double reward = Math.pow(gamma, j - 2) * (lastReward + gamma * maxPrediction);
-            updateClassifier(reward, actionSets.get(i));
+    public synchronized void updateActionSets(double maxPrediction) {
+        synchronized (lastRewardLock) {
+            for (int i = actionSets.size() - 2; i > 0; i--) {
+                int j = actionSets.size() - i;
+                double reward;
+                // add maxPrediction only to the second news set and only update lastReward else
+                // this stops problems
+                if (i == actionSets.size() - 2) { // j = 2
+                    reward = lastReward + gamma * maxPrediction;
+                } else { // j < 2
+                    reward = Math.pow(gamma, j - 2) * (lastReward);
+                }
+                if (reward > 2000 || reward < -2000) {
+                    System.out.println("First: " + Math.pow(gamma, j - 2) + " LastReward: " + lastReward + " maxPred:" +
+                            (gamma * maxPrediction));
+                }
+                if (reward > 1000000 || reward < -100000)
+                    System.exit(-2);
+                // update cumulated reward in actionSets
+                actionSets.get(i).setValue(actionSets.get(i).getValue() + reward);
+            }
         }
 
     }
 
     public void finnish() {
         // Method for last Evaluation when game finished
-        actionSets.add(new HashSet<Classifier>()); // add empty HashSet to as there is no Action Set in this last Step
-        updateActionSets(0);
-        actionSets.clear(); // empty all saved action sets
-        allActionSets.clear();
+        synchronized (actionSetsLock) {
+            actionSets.add(new AbstractMap.SimpleEntry<HashSet, Double>(new HashSet(), 0.)); // add empty HashSet to as there is no Action Set in this last Step
+            updateActionSets(0);
+            for (AbstractMap.SimpleEntry<HashSet, Double> actionSetMap : actionSets) {
+                updateClassifier(actionSetMap.getValue(), actionSetMap.getKey()); // Update all remaining Action Sets
+            }
+            actionSets.clear(); // empty all saved action sets
+        }
+        synchronized (allActionSetsLock) {
+            allActionSets.clear();
+        }
+        synchronized (lastRewardLock) {
+            lastReward = 0;
+        }
     }
 
     private void generateMatchSet(Unit unit) {
@@ -213,16 +251,18 @@ public class XCS {
             double sumPositvPrediction = 0;
             for (int aId : predictionSet.keySet()) {
                 double pred = predictionSet.get(aId);
+                System.out.println("aId: " + aId + " pred: " + pred);
                 if (pred > 0) {
                     sumPositvPrediction += pred;
                 }
                 if (pred > bestPrediction) {
                     // select action id with best prediction
-                    bestPrediction = predictionSet.get(aId);
+                    bestPrediction = pred;
                     selectedActionId = aId;
                 }
             }
             if (sumPositvPrediction > 0) {
+                System.out.println("Sum of Positv Predcition is positiv");
                 // at least some of the conditions predict positive reward
                 // choose action probable based on reward size
                 double threshold = random.nextDouble() * sumPositvPrediction;
@@ -243,14 +283,16 @@ public class XCS {
 
     // updates the actionSet based on the current match set and the selectedActionId
     private void generateActionSet(int selectedActionId) {
-        HashSet<Classifier> actionSet = new HashSet<Classifier>();
+        HashSet<Classifier> actionHashSet = new HashSet<Classifier>();
         for (Classifier classifier : matchSet) {
             if (classifier.getActionId() == selectedActionId) {
-                actionSet.add(classifier);
+                actionHashSet.add(classifier);
             }
         }
-        actionSets.add(actionSet);
-        allActionSets.add(actionSet);
+        actionSets.add(new AbstractMap.SimpleEntry<HashSet, Double>(actionHashSet, 0.));
+        synchronized (allActionSetsLock) {
+            allActionSets.add(actionHashSet);
+        }
     }
 
     private void updateFitness(HashSet<Classifier> usedActionSet) {
@@ -273,7 +315,7 @@ public class XCS {
         // This Method updates the last action classifiers based on the reward they got and the expected reward the will
         // get from the current Action set (this is already calculated in die variable reward)
 
-        LOGGER.info("Updated set: " + usedActionSet + " with Reward: " + reward);
+        LOGGER.info("Updated set: " + usedActionSet.hashCode() + " with Reward: " + reward);
         int sumNumerosity = 0;
         for (Classifier cl : usedActionSet) {
             sumNumerosity += cl.getNumerosisty();
@@ -303,9 +345,11 @@ public class XCS {
         // TODO: Implement action set subsumation (maybe GA is enough)
     }
 
-    public void reward(double reward) {
+    public synchronized void reward(double reward) {
         // Function Adds the given reward to the action and lastActionSet for every unit
-        lastReward += reward; // add all Rewards to lastReward for next iteration
+        synchronized (lastRewardLock) {
+            lastReward += reward; // add all Rewards to lastReward for next iteration
+        }
     }
 
     public void reward(Unit unit, double reward) {
@@ -317,11 +361,13 @@ public class XCS {
     // Rewards all Actionsets in the current game
     // The lastReward gets distributed between all Actionsets if fixed is false
     public void rewardAllActionSets(double reward, boolean fixed) {
-        if (!fixed)
-            reward = reward / allActionSets.size();
-        LOGGER.warning("Rewarded all actions with: " + reward);
-        for (HashSet<Classifier> set : allActionSets) {
-            updateClassifier(reward, set);
+        synchronized (allActionSetsLock) {
+            if (!fixed)
+                reward = reward / allActionSets.size();
+            LOGGER.warning("Rewarded all actions with: " + reward);
+            for (HashSet<Classifier> set : allActionSets) {
+                updateClassifier(reward, set);
+            }
         }
     }
 
