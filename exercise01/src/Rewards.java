@@ -12,6 +12,7 @@ public class Rewards {
 
 
     // Negative Rewards
+    public static final double HOLD = -0.01;
     public static final int ILLEGAL_MOVE = -1;
     public static final int HIDE_ENEMY = -15;
     public static final int CANNOT_ATTACK = -10;
