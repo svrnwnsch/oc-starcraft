@@ -21,7 +21,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     private HashMap<Unit, Integer> friendlyUnitHealth = new HashMap<>();
     private int wonGames = 0;
     private int lostGames = 0;
-    private boolean loadGame = true;
+    private boolean loadGame = false;
     private boolean saveGame = true;
 
 
@@ -69,7 +69,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
         //vulture.step();
         List<Unit> allUnits = game.getAllUnits();
         //LOGGER.info("size of all Units:" + allUnits.size());
-        if (frame % 5 == 0) {
+        if (frame % 3 == 0) {
             // execute xcs only every second frame
 
             for (Unit unit : allUnits) {
@@ -150,9 +150,11 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     public void onEnd(boolean winner) {
         if (winner) {
             xcs.reward(Rewards.WIN_GAME);
+            xcs.rewardAllActionSets(Rewards.WIN_GAME, false);
             wonGames++;
         } else {
             xcs.reward(Rewards.LOSE_GAME);
+            xcs.rewardAllActionSets(Rewards.LOSE_GAME_STEP, true);
             lostGames++;
         }
         LOGGER.warning("Game Ended did we win? " + winner + " Number of Classifiers: " + xcs.getPopSize()
