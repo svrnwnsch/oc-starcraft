@@ -9,6 +9,6 @@ public class HoldAction implements Action {
     @Override
     public double executeAction(Unit executingUnit) {
         executingUnit.stop();
-        return 0;
+        return Rewards.HOLD;
     }
 }
