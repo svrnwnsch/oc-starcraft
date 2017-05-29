@@ -14,7 +14,7 @@ public class MoveAction implements Action {
 
     // moveAngle should be in Radians
     private double moveAngle;
-    private int moveRadius = 20;
+    private int moveRadius = 100;
     Game game;
 
     public MoveAction(Game game, double moveAngle) {
