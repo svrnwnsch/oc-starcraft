@@ -266,12 +266,13 @@ public class XCS {
                 // at least some of the conditions predict positive reward
                 // choose action probable based on reward size
                 double threshold = random.nextDouble() * sumPositvPrediction;
+                double predSum = 0;
                 for (int aId : predictionSet.keySet()) {
                     double pred = predictionSet.get(aId);
                     if (pred > 0) {
-                        sumPositvPrediction += pred;
+                        predSum += pred;
                     }
-                    if (sumPositvPrediction > threshold) {
+                    if (predSum >= threshold) {
                         return aId;
                     }
                 }
