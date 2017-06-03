@@ -76,8 +76,8 @@ public class Condition implements java.io.Serializable {
 
     public boolean matchSituation(Situation externSituation){
         boolean result = (matchVariable(externSituation.getUnitHitpoints(), situation.getUnitHitpoints(), unitHitPointsInterval)) &&
-                //(matchVariable(externSituation.getUnitPosX(), situation.getUnitPosX(), unitPosXInterval)) &&
-                //(matchVariable(externSituation.getUnitPosY(), situation.getUnitPosY(), unitPosYInterval)) &&
+                (matchVariable(externSituation.getUnitPosX(), situation.getUnitPosX(), unitPosXInterval)) &&
+                (matchVariable(externSituation.getUnitPosY(), situation.getUnitPosY(), unitPosYInterval)) &&
                 (matchVariable(externSituation.getUnitGroundCooldown(), situation.getUnitGroundCooldown(), unitGroundCooldownInterval)) &&
                 (matchVariable(externSituation.getNumberAlliesOnMap(), situation.getNumberAlliesOnMap(), numberAlliesOnMapInterval)) &&
                 (matchVariable(externSituation.getNumberSightedEnemiesOnMap(), situation.getNumberSightedEnemiesOnMap(), numberSightedEnemiesOnMapInterval)) &&
@@ -86,13 +86,17 @@ public class Condition implements java.io.Serializable {
             result = result && (matchVariable(externSituation.getClosestAllies().get(i).normedDistance, situation.getClosestAllies().get(i).normedDistance, closestAlliesInterval.get(i).normedDistanceInterval)) &&
                     (matchVariable(externSituation.getClosestAllies().get(i).normedAngle, situation.getClosestAllies().get(i).normedAngle, closestAlliesInterval.get(i).normedAngleInterval)) &&
                     (matchVariable(externSituation.getClosestAllies().get(i).normedHitPoints, situation.getClosestAllies().get(i).normedHitPoints, closestAlliesInterval.get(i).normedHitPointsInterval)) &&
-                    (matchVariable(externSituation.getClosestAllies().get(i).unitType, situation.getClosestAllies().get(i).unitType, closestAlliesInterval.get(i).unitTypeInterval));
+                    (matchVariable(externSituation.getClosestAllies().get(i).unitType, situation.getClosestAllies().get(i).unitType, closestAlliesInterval.get(i).unitTypeInterval)) &&
+                    (matchVariable(externSituation.getClosestAllies().get(i).velocityX, situation.getClosestAllies().get(i).velocityX, closestAlliesInterval.get(i).velocityXInterval)) &&
+                    (matchVariable(externSituation.getClosestAllies().get(i).velocityY, situation.getClosestAllies().get(i).velocityY, closestAlliesInterval.get(i).velocityYInterval));
         }
         for(int i=0; i<Situation.closestEnemiesArraySize; i++){
             result = result && (matchVariable(externSituation.getClosestEnemies().get(i).normedDistance, situation.getClosestEnemies().get(i).normedDistance, closestEnemiesInterval.get(i).normedDistanceInterval)) &&
                     (matchVariable(externSituation.getClosestEnemies().get(i).normedAngle, situation.getClosestEnemies().get(i).normedAngle, closestEnemiesInterval.get(i).normedAngleInterval)) &&
                     (matchVariable(externSituation.getClosestEnemies().get(i).normedHitPoints, situation.getClosestEnemies().get(i).normedHitPoints, closestEnemiesInterval.get(i).normedHitPointsInterval)) &&
-                    (matchVariable(externSituation.getClosestEnemies().get(i).unitType, situation.getClosestEnemies().get(i).unitType, closestEnemiesInterval.get(i).unitTypeInterval));
+                    (matchVariable(externSituation.getClosestEnemies().get(i).unitType, situation.getClosestEnemies().get(i).unitType, closestEnemiesInterval.get(i).unitTypeInterval)) &&
+                    (matchVariable(externSituation.getClosestEnemies().get(i).velocityX, situation.getClosestEnemies().get(i).velocityX, closestEnemiesInterval.get(i).velocityXInterval)) &&
+                    (matchVariable(externSituation.getClosestEnemies().get(i).velocityY, situation.getClosestEnemies().get(i).velocityY, closestEnemiesInterval.get(i).velocityYInterval));
         }
         return result;
 

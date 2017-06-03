@@ -24,12 +24,16 @@ public class ReducedUnit implements java.io.Serializable {
     public double normedAngle = 1.;
     public double normedHitPoints = 1.;
     public double unitType = 1.;
+    public double velocityX = 0;
+    public double velocityY = 0;
 
     public void printReducedUnit() {
         System.out.print("\tnormeddistance " + normedDistance);
         System.out.print("\tnormedangle " + normedAngle);
         System.out.print("\tnormedHitpoints " + normedHitPoints);
         System.out.print("\tunittype " + unitType);
+        System.out.print("\tvx " + velocityX);
+        System.out.print("\tvy " + velocityY);
     }
 
     public ReducedUnit(){
@@ -41,6 +45,12 @@ public class ReducedUnit implements java.io.Serializable {
         this.normedDistance = Math.exp(-position.getDistance(unit.getPosition()) / 100);
         this.normedAngle = calculateAngle(position, unit.getPosition());
         this.unitType = ((double) unitTypeMap.get(unit.getType())) / 100;
+        this.velocityX = (unit.getVelocityX() + 20) / 40;
+        this.velocityY = (unit.getVelocityY() + 20) / 40;
+        if (velocityY < 0 || velocityY > 1 || velocityX < 0 || velocityX > 1) {
+            System.out.println("Velocity out of boundaries vx: " + velocityX + " vy: " + velocityY);
+            System.exit(-10);
+        }
     }
 
     public double calculateAngle(Position centerPosition, Position relativePosition){

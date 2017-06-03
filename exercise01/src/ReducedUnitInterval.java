@@ -8,19 +8,26 @@ public class ReducedUnitInterval implements java.io.Serializable {
     public double normedAngleInterval;
     public double normedHitPointsInterval;
     public double unitTypeInterval;
+    public double velocityXInterval;
+    public double velocityYInterval;
 
     public void printReducedUnitInterval() {
-        System.out.print("\tnormedhitpointsinverval" + normedHitPointsInterval);
-        System.out.print("\tnormedangleinter" + normedAngleInterval);
-        System.out.print("\tnormedhitpointsintver" + normedHitPointsInterval);
-        System.out.print("\tunitTypeInterval" + unitTypeInterval);
+        System.out.print("\tnormedhitpointsinverval " + normedHitPointsInterval);
+        System.out.print("\tnormedangleinter " + normedAngleInterval);
+        System.out.print("\tnormedhitpointsintver " + normedHitPointsInterval);
+        System.out.print("\tunitTypeInterval " + unitTypeInterval);
+        System.out.print("\tvxInterval " + velocityXInterval);
+        System.out.print("\tvyInterval " + velocityYInterval);
     }
 
-    public ReducedUnitInterval(double normedDistanceInterval, double normedAngleInterval, double normedHitPointsInterval, double unitTypeInterval){
+    public ReducedUnitInterval(double normedDistanceInterval, double normedAngleInterval, double normedHitPointsInterval,
+                               double unitTypeInterval, double velocityXInterval, double velocityYInterval) {
         this.normedDistanceInterval = normedDistanceInterval;
         this.normedAngleInterval = normedAngleInterval;
         this.normedHitPointsInterval = normedHitPointsInterval;
         this.unitTypeInterval = unitTypeInterval;
+        this.velocityXInterval = velocityXInterval;
+        this.velocityYInterval = velocityYInterval;
     }
 
     public ReducedUnitInterval() {
@@ -28,6 +35,8 @@ public class ReducedUnitInterval implements java.io.Serializable {
         normedAngleInterval = Math.abs(Condition.getRandomInterval());
         normedHitPointsInterval = Math.abs(Condition.getRandomInterval());
         unitTypeInterval = Math.abs(Condition.getRandomInterval());
+        velocityXInterval = Math.abs(Condition.getRandomInterval());
+        velocityYInterval = Math.abs(Condition.getRandomInterval());
 
     }
 
