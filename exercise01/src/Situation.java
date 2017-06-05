@@ -21,6 +21,9 @@ public class Situation implements java.io.Serializable {
     public static final int maxPossibleHP = 1000;
     // TODO: update if we have buildings
 
+    // Number of primitive Variables in this Class
+    public static final int LENGTH = 7;
+
 
     private double unitHitPoints;
     private double unitPosX;
@@ -82,6 +85,26 @@ public class Situation implements java.io.Serializable {
         numberSightedEnemiesOnMap = ConditionUtil.parseValue(enemiesOnMap.size(), maxUnits);
 
 
+    }
+
+    // Constructor for Deepcopy
+
+    public Situation(Situation parent) {
+        unitPosX = parent.unitPosX;
+        unitPosY = parent.unitPosY;
+        unitHitPoints = parent.unitHitPoints;
+        unitGroundCooldown = parent.unitGroundCooldown;
+        killCountAllies = parent.killCountAllies;
+        closestAllies = new ArrayList<>();
+        for (ReducedUnit reducedUnit : parent.closestAllies) {
+            closestAllies.add(new ReducedUnit(reducedUnit));
+        }
+        closestEnemies = new ArrayList<>();
+        for (ReducedUnit reducedUnit : parent.closestEnemies) {
+            closestEnemies.add(new ReducedUnit(reducedUnit));
+        }
+        numberAlliesOnMap = parent.getNumberAlliesOnMap();
+        numberSightedEnemiesOnMap = parent.getNumberSightedEnemiesOnMap();
     }
 
     //Getting number many closest units to mainUnit sorted as an ArrayList. Sorting may be optimized
@@ -152,14 +175,35 @@ public class Situation implements java.io.Serializable {
         return unitHitPoints;
     }
 
+    public double getUnitHitPoints() {
+        return unitHitPoints;
+    }
 
-    //private Pattern conditionPattern;
+    public void setUnitHitPoints(double unitHitPoints) {
+        this.unitHitPoints = unitHitPoints;
+    }
 
-    //public Condition(String regex) {
-    //  conditionPattern = Pattern.compile(regex);
-    //}
+    public void setUnitPosX(double unitPosX) {
+        this.unitPosX = unitPosX;
+    }
 
-    //public boolean matches(String environment) {
-    //    return conditionPattern.matcher(environment).matches();
-    //}
+    public void setUnitPosY(double unitPosY) {
+        this.unitPosY = unitPosY;
+    }
+
+    public void setUnitGroundCooldown(double unitGroundCooldown) {
+        this.unitGroundCooldown = unitGroundCooldown;
+    }
+
+    public void setNumberAlliesOnMap(double numberAlliesOnMap) {
+        this.numberAlliesOnMap = numberAlliesOnMap;
+    }
+
+    public void setNumberSightedEnemiesOnMap(double numberSightedEnemiesOnMap) {
+        this.numberSightedEnemiesOnMap = numberSightedEnemiesOnMap;
+    }
+
+    public void setKillCountAllies(double killCountAllies) {
+        this.killCountAllies = killCountAllies;
+    }
 }

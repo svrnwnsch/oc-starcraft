@@ -39,14 +39,14 @@ public class XCS {
 
     // XCS parameters taken from "An Algorithmic Description of XCS"
 
-    private int N = 5000;  // population Size  untested
+    private int N = 25000;  // population Size  untested
     private double beta = 0.1;  // learning rate
     private double alpha = 0.1;
     private double epsilon0 = 1; // should be 1% of maximum predicted reward
     private double nu = 5; // power parameter
-    private double gamma = 0.8; // discount factor
-    private int thetaGA = 30;
-    private double chi = 0.7; // crossover probabilities
+    private double gamma = 0.71; // discount factor
+    private int thetaGA = 40;
+    private double chi = 1; // crossover probabilities 0.5-1
     private double mu = 0.02; // mutation probability
     public static final double thetaDel = 20; // deletion threshold
     public static final double delta = 0.1;
@@ -54,8 +54,9 @@ public class XCS {
     public static double pInit = 0; // Predicted reward init
     public static double epsilonInit = 0; // prediction error init
     public static double FInit = 0; // Fitness init
-    private double pExplor = 0.2; // exploration probability
+    private double pExplor = 0.4; // exploration probability
     private int thetaMNA; // number of all possible Action
+    private static final boolean DO_GA_SUBSUMPTION = true;
 
     private int timestep = 0;
     private static int MULTI_STEP_REWARD_LENGTH = 30;
@@ -78,11 +79,11 @@ public class XCS {
         LOGGER.info("Initialised HoldAction");
         actionDic.put(1, new MoveAction(this.game, 0)); // Move Right
         //actionDic.put(2, new MoveAction(this.game, 45)); // Move Right Down
-        //actionDic.put(3, new MoveAction(this.game, 90)); // Move Down
+        actionDic.put(3, new MoveAction(this.game, 90)); // Move Down
         //actionDic.put(4, new MoveAction(this.game, 135)); // Move Left Down
         actionDic.put(5, new MoveAction(this.game, 180)); // Move Left
         //actionDic.put(6, new MoveAction(this.game, 225)); // Move Left Up
-        //actionDic.put(7, new MoveAction(this.game, 270)); // Move Up
+        actionDic.put(7, new MoveAction(this.game, 270)); // Move Up
         //actionDic.put(8, new MoveAction(this.game, 315)); // Move Right Up
         LOGGER.info("Initialised MoveActions");
 
@@ -245,13 +246,13 @@ public class XCS {
             // do exploration
             List<Integer> aIds = new ArrayList<Integer>(predictionSet.keySet());
             selectedActionId = aIds.get(random.nextInt(aIds.size()));
-            System.out.println("Do expolration " + timestep);
+            LOGGER.info("Do expolration " + timestep);
         } else {
             double bestPrediction = Double.NEGATIVE_INFINITY;
             double sumPositvPrediction = 0;
             for (int aId : predictionSet.keySet()) {
                 double pred = predictionSet.get(aId);
-                System.out.println("aId: " + aId + " pred: " + pred);
+                LOGGER.config("aId: " + aId + " pred: " + pred);
                 if (pred > 0) {
                     sumPositvPrediction += pred;
                 }
@@ -262,7 +263,6 @@ public class XCS {
                 }
             }
             if (sumPositvPrediction > 0) {
-                System.out.println("Sum of Positv Predcition is positiv");
                 // at least some of the conditions predict positive reward
                 // choose action probable based on reward size
                 double threshold = random.nextDouble() * sumPositvPrediction;
@@ -343,6 +343,7 @@ public class XCS {
                 cl.setActionSetSize(cl.getActionSetSize() + beta * (sumNumerosity - cl.getActionSetSize()));
         }
         updateFitness(usedActionSet);
+        runGA(usedActionSet);
         // TODO: Implement action set subsumation (maybe GA is enough)
     }
 
@@ -374,17 +375,11 @@ public class XCS {
 
     private void deleteFromPopulation() {
         // Removes Conditions from the population until the size of the population is N
-        // TODO: Implement Method
+        // TODO: rewrite function so that it uses numerosity to calculate the population size
         while (population.size() > N) {
 
 
-            double totalFitness = 0;
-            int totalNumerosity = 0;
-            for (Classifier c : population) {
-                totalFitness += c.getFitness();
-                totalNumerosity += c.getNumerosisty();
-            }
-            double avFitnessInPopulation = totalFitness / totalNumerosity;
+            double avFitnessInPopulation = getAverageFitness();
             LOGGER.warning("Population is full deleting a Classifier. Avg Fitness: " + avFitnessInPopulation);
             double voteSum = 0;
             for (Classifier c : population) {
@@ -408,8 +403,98 @@ public class XCS {
         }
     }
 
+    private void runGA(HashSet<Classifier> usedActionSet) {
+        // only run GA if the following condition is met
+        double sumNumerosity = 0, sumTimesteps = 0;
+        for (Classifier cl : usedActionSet) {
+            sumTimesteps += cl.getTs() * cl.getNumerosisty();
+            sumNumerosity += cl.getNumerosisty();
+        }
+
+        if (!((timestep - sumTimesteps / sumNumerosity) > thetaGA)) {
+            return;
+        }
+        LOGGER.info("The GA starts " + (timestep - sumTimesteps / sumNumerosity));
+        // updating the timestep the last time the GA was applied to set with this classifier
+        for (Classifier cl : usedActionSet) {
+            cl.setTs(timestep);
+        }
+        Classifier parent1 = selectOffspring(usedActionSet);
+        Classifier parent2 = selectOffspring(usedActionSet);
+        // Do a deep copy of the Classifier
+        Classifier child1 = new Classifier(parent1);
+        Classifier child2 = new Classifier(parent2);
+        if (random.nextDouble() < chi) {
+            ConditionUtil.applyCrossover(child1.getCondition(), child2.getCondition());
+            child1.setPrediction((parent1.getPrediction() + parent2.getPrediction()) / 2);
+            child1.setPredictionError((parent1.getPredictionError() + parent2.getPredictionError()) / 2);
+            child1.setFitness((parent1.getFitness() + parent2.getFitness()) / 2);
+            child2.setPrediction(child1.getPrediction());
+            child2.setPredictionError(child1.getPredictionError());
+            child2.setFitness(child1.getFitness());
+        }
+        child1.setFitness(child1.getFitness() * 0.1);
+        child2.setFitness(child2.getFitness() * 0.1);
+        ArrayList<Classifier> children = new ArrayList<>();
+        children.add(child1);
+        children.add(child2);
+        for (Classifier child : children) {
+            applyMutation(child);
+            if (DO_GA_SUBSUMPTION) {
+                if (doesSubsume(parent1, child)) {
+                    parent1.setNumerosity(parent1.getNumerosisty() + 1);
+                } else if (doesSubsume(parent2, child)) {
+                    parent2.setNumerosity(parent2.getNumerosisty() + 1);
+                } else {
+                    population.add(child);
+                }
+            } else {
+                population.add(child);
+            }
+        }
+        LOGGER.fine("The GA finnished ");
+        deleteFromPopulation();
+
+    }
+
+    // selection wheel to return Classifier based on Fitness
+    private Classifier selectOffspring(HashSet<Classifier> usedActionSet) {
+        double fitnessSum = 0;
+        for (Classifier cl : usedActionSet) {
+            fitnessSum += cl.getFitness();
+        }
+        double choicePoint = random.nextDouble() * fitnessSum;
+        fitnessSum = 0;
+        for (Classifier cl : usedActionSet) {
+            fitnessSum += cl.getFitness();
+            if (fitnessSum >= choicePoint) {
+                return cl;
+            }
+        }
+        return null;
+    }
+
+    private void applyMutation(Classifier child) {
+        //TODO: implement method
+    }
+
+    private boolean doesSubsume(Classifier parent, Classifier child) {
+        //TODO: implement method
+        return false;
+    }
+
     public int getPopSize() {
         return population.size();
+    }
+
+    public double getAverageFitness() {
+        double totalFitness = 0;
+        int totalNumerosity = 0;
+        for (Classifier c : population) {
+            totalFitness += c.getFitness();
+            totalNumerosity += c.getNumerosisty();
+        }
+        return totalFitness / totalNumerosity;
     }
 
     public void loadXCS(String filename) {
@@ -434,8 +519,6 @@ public class XCS {
         LOGGER.info("Loading " + filename + "completed");
         LOGGER.info(population.size() + " Classifier loaded");
         LOGGER.fine("Current path: " + Paths.get("").toAbsolutePath().toString());
-        // Loads a XCS from a given filename
-        // TODO: Implement Loading functionality
     }
 
     public void saveXCS(String filename) {

@@ -12,6 +12,9 @@ public class ReducedUnit implements java.io.Serializable {
     //public static String bla = "bla";
     public static final Map<UnitType, Integer> unitTypeMap = createMap();
 
+    // Number of primitive Variables in this Class
+    public static final int LENGTH = 6;
+
     public static Map<UnitType, Integer> createMap() {
         Map<UnitType, Integer> typeMap = new HashMap<UnitType, Integer>();
         typeMap.put(UnitType.Terran_Command_Center, 0);
@@ -51,6 +54,16 @@ public class ReducedUnit implements java.io.Serializable {
             System.out.println("Velocity out of boundaries vx: " + velocityX + " vy: " + velocityY);
             System.exit(-10);
         }
+    }
+
+    // Constructor for Deepcopy
+    public ReducedUnit(ReducedUnit parent) {
+        this.normedHitPoints = parent.normedHitPoints;
+        this.normedDistance = parent.normedDistance;
+        this.normedAngle = parent.normedAngle;
+        this.unitType = parent.unitType;
+        this.velocityX = parent.velocityX;
+        this.velocityY = parent.velocityY;
     }
 
     public double calculateAngle(Position centerPosition, Position relativePosition){

@@ -37,13 +37,16 @@ public class ReducedUnitInterval implements java.io.Serializable {
         unitTypeInterval = Math.abs(Condition.getRandomInterval());
         velocityXInterval = Math.abs(Condition.getRandomInterval());
         velocityYInterval = Math.abs(Condition.getRandomInterval());
-
     }
 
-    /*public static double distance(Position position1, Position position2){
-        int diffX = position1.getX() - position2.getX();
-        int diffY = position1.getY() - position2.getY();
-        return (double) diffX
-    }*/
+    // Method for deepcopy
+    public ReducedUnitInterval(ReducedUnitInterval parent) {
+        normedDistanceInterval = parent.normedDistanceInterval;
+        normedAngleInterval = parent.normedAngleInterval;
+        normedHitPointsInterval = parent.normedHitPointsInterval;
+        unitTypeInterval = parent.unitTypeInterval;
+        velocityXInterval = parent.velocityXInterval;
+        velocityYInterval = parent.velocityYInterval;
+    }
 
 }

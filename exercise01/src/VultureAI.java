@@ -21,12 +21,12 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     private HashMap<Unit, Integer> friendlyUnitHealth = new HashMap<>();
     private int wonGames = 0;
     private int lostGames = 0;
-    private boolean loadGame = false;
+    private boolean loadGame = true;
     private boolean saveGame = true;
 
 
     public VultureAI() {
-        LOGGER.setLevel(Level.INFO);
+        LOGGER.setLevel(Level.WARNING);
 
         // Code so that console shows all logger events down to finer
         ConsoleHandler handler = new ConsoleHandler();
@@ -157,9 +157,10 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
             //xcs.rewardAllActionSets(Rewards.LOSE_GAME_STEP, true);
             lostGames++;
         }
-        LOGGER.warning("Game Ended did we win? " + winner + " Number of Classifiers: " + xcs.getPopSize()
-                + " Number of games won: " + wonGames + " Number of games lost: " + lostGames);
         xcs.finnish();
+        LOGGER.warning("Game Ended did we win? " + winner + " Number of Classifiers: " + xcs.getPopSize()
+                + " Number of games won: " + wonGames + " Number of games lost: " + lostGames + " avg. Fitness: "
+                + xcs.getAverageFitness());
         if (saveGame) {
             xcs.saveXCS(XCS.fileName);
         }

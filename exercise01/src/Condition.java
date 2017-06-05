@@ -65,6 +65,28 @@ public class Condition implements java.io.Serializable {
 
     }
 
+    // Deep Copy Constructor
+    public Condition(Condition parentCond) {
+        this.situation = new Situation(parentCond.situation);
+        unitHitPointsInterval = parentCond.unitHitPointsInterval;
+        unitPosXInterval = parentCond.unitPosXInterval;
+        unitPosYInterval = parentCond.unitPosYInterval;
+        unitGroundCooldownInterval = parentCond.unitGroundCooldownInterval;
+        numberAlliesOnMapInterval = parentCond.numberAlliesOnMapInterval;
+        numberEnemiesOnMapInterval = parentCond.numberEnemiesOnMapInterval;
+        numberSightedEnemiesOnMapInterval = parentCond.numberSightedEnemiesOnMapInterval;
+        killCountAlliesInterval = parentCond.killCountAlliesInterval;
+        killCountEnemiesInterval = parentCond.killCountAlliesInterval;
+        closestAlliesInterval = new ArrayList<ReducedUnitInterval>(parentCond.closestAlliesInterval.size());
+        for (int i = 0; i < parentCond.closestAlliesInterval.size(); i++) {
+            closestAlliesInterval.add(i, new ReducedUnitInterval(parentCond.closestAlliesInterval.get(i)));
+        }
+        closestEnemiesInterval = new ArrayList<ReducedUnitInterval>(parentCond.closestEnemiesInterval.size());
+        for (int i = 0; i < parentCond.closestEnemiesInterval.size(); i++) {
+            closestEnemiesInterval.add(i, new ReducedUnitInterval(parentCond.closestEnemiesInterval.get(i)));
+        }
+    }
+
     public static double getRandomInterval() {
 
         if (random.nextDouble() < pIntervalOne) {
@@ -106,4 +128,5 @@ public class Condition implements java.io.Serializable {
     public boolean matchVariable(double situationValue, double conditionValue, double conditionInterval){
         return (conditionValue - conditionInterval <= situationValue && conditionValue + conditionInterval >= situationValue);
     }
+
 }
