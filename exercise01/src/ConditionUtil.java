@@ -20,8 +20,8 @@ public class ConditionUtil {
         double tmp;
         if (startCrossover > endCrossover) {
             tmp = startCrossover;
-            endCrossover = startCrossover;
-            startCrossover = tmp;
+            startCrossover = endCrossover;
+            endCrossover = tmp;
         }
         int i = 0;
         if (startCrossover <= i && i < endCrossover) {
@@ -287,6 +287,11 @@ public class ConditionUtil {
         i++;
         */
 
+    }
+
+    public static void applyMutation(Condition condition) {
+        int sizeCondtion = 2 * (Situation.LENGTH + (Situation.closestAlliesArraySize +
+                Situation.closestEnemiesArraySize) * ReducedUnit.LENGTH);
     }
 
 }
