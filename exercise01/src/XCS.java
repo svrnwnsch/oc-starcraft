@@ -380,7 +380,7 @@ public class XCS {
 
 
             double avFitnessInPopulation = getAverageFitness();
-            LOGGER.warning("Population is full deleting a Classifier. Avg Fitness: " + avFitnessInPopulation);
+            LOGGER.info("Population is full deleting a Classifier. Avg Fitness: " + avFitnessInPopulation);
             double voteSum = 0;
             for (Classifier c : population) {
                 voteSum += c.vote(avFitnessInPopulation);

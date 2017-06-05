@@ -50,10 +50,11 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
         this.frame = 0;
         friendlyUnitHealth.clear();
         LOGGER.config("Clearing FriendlyUnitHealth");
-        if (xcs == null)
+        if (xcs == null) {
             xcs = new XCS(game);
-        if (loadGame)
-            xcs.loadXCS(XCS.fileName);
+            if (loadGame)
+                xcs.loadXCS(XCS.fileName);
+        }
         // complete map information
         this.game.enableFlag(0);
         
