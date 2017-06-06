@@ -39,7 +39,7 @@ public class XCS {
 
     // XCS parameters taken from "An Algorithmic Description of XCS"
 
-    private int N = 25000;  // population Size  untested
+    private int N = 10000;  // population Size  untested
     private double beta = 0.1;  // learning rate
     private double alpha = 0.1;
     private double epsilon0 = 1; // should be 1% of maximum predicted reward
@@ -48,7 +48,7 @@ public class XCS {
     private int thetaGA = 40;
     private double chi = 1; // crossover probabilities 0.5-1
     public static double mu = 0.02; // mutation probability
-    public static final double thetaDel = 20; // deletion threshold
+    public static final double thetaDel = 50; // deletion threshold
     public static final double delta = 0.1;
     private double thetaSub = 20; // subsumption threshold
     public static double pInit = 0; // Predicted reward init
@@ -60,6 +60,13 @@ public class XCS {
 
     private int timestep = 0;
     private static int MULTI_STEP_REWARD_LENGTH = 30;
+
+    // Statistic trackers for xcs
+    public int deletedClassifiers = 0;
+    public int coveredClassifiers = 0;
+    public int GARuns = 0;
+    public int explorations = 0;
+    public int steps = 0;
 
     public XCS() {
         // only used to print population
@@ -102,11 +109,9 @@ public class XCS {
         // TODO: Problem if we have more then one Unit the action set and last action set should be saved for each unit
         //       with respect their last actions
 
-        // Shallow Copy of action set into last actions set
         timestep++;
+        steps++;
         LOGGER.config("Do xcs step");
-        //lastActionSet = (HashSet<Classifier>) actionSet.clone();
-        // empty Matchset
         generateMatchSet(unit);
         LOGGER.config("Generated Match set");
         int selectedActionId = selectActionId();
@@ -205,7 +210,8 @@ public class XCS {
                 missingActionIds.removeAll(actionsId);
                 for (int i : missingActionIds) {
                     Classifier newClassifier = new Classifier(currentSituation, timestep);
-                    LOGGER.warning("Covering: Created New Classifier with Action Id: " + i);
+                    LOGGER.info("Covering: Created New Classifier with Action Id: " + i);
+                    coveredClassifiers++;
                     newClassifier.setActionId(i);
                     population.add(newClassifier);
                 }
@@ -243,11 +249,12 @@ public class XCS {
         predictionSet.values().removeIf(Objects::isNull); // remove all Actions where it is null
         int selectedActionId = -1;
         // reduce over time the expolration to 1% of original Expolration
-        if (random.nextDouble() < (pExplor - 0.99 * pExplor * Math.exp(-100000. / timestep))) {
+        if (random.nextDouble() < (pExplor - 0.99 * pExplor * Math.exp(-50000. / timestep))) {
             // do exploration
             List<Integer> aIds = new ArrayList<Integer>(predictionSet.keySet());
             selectedActionId = aIds.get(random.nextInt(aIds.size()));
             LOGGER.info("Do expolration " + timestep);
+            explorations++;
         } else {
             double bestPrediction = Double.NEGATIVE_INFINITY;
             double sumPositvPrediction = 0;
@@ -378,7 +385,7 @@ public class XCS {
         // Removes Conditions from the population until the size of the population is N
         // TODO: rewrite function so that it uses numerosity to calculate the population size
         while (population.size() > N) {
-
+            deletedClassifiers++;
 
             double avFitnessInPopulation = getAverageFitness();
             LOGGER.info("Population is full deleting a Classifier. Avg Fitness: " + avFitnessInPopulation);
@@ -416,6 +423,7 @@ public class XCS {
             return;
         }
         LOGGER.info("The GA starts " + (timestep - sumTimesteps / sumNumerosity));
+        GARuns++;
         // updating the timestep the last time the GA was applied to set with this classifier
         for (Classifier cl : usedActionSet) {
             cl.setTs(timestep);
@@ -476,7 +484,6 @@ public class XCS {
     }
 
     private void applyMutation(Classifier child) {
-        //TODO: implement method
         // mutate classifiers
         ConditionUtil.applyMutation(child.getCondition());
         // mutate ActionId
@@ -552,6 +559,19 @@ public class XCS {
         }
 
 
+    }
+
+    public int getTimestep() {
+        return timestep;
+    }
+
+    // Function to clean up statistics the current XCS for new game
+    public void cleanUp() {
+        deletedClassifiers = 0;
+        coveredClassifiers = 0;
+        GARuns = 0;
+        explorations = 0;
+        steps = 0;
     }
 
     public void printClassifiers() {

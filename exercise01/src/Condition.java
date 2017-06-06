@@ -6,7 +6,7 @@ import java.util.Random;
 public class Condition implements java.io.Serializable {
     public static final double sigma = 0.1;
     // probability to set Interval to 1
-    public static final double pIntervalOne = 0.1;
+    public static final double pIntervalOne = 0.2;
 
     public Situation situation;
 

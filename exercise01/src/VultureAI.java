@@ -21,7 +21,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     private HashMap<Unit, Integer> friendlyUnitHealth = new HashMap<>();
     private int wonGames = 0;
     private int lostGames = 0;
-    private boolean loadGame = true;
+    private boolean loadGame = false;
     private boolean saveGame = true;
 
 
@@ -139,7 +139,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     public void onUnitDestroy(Unit unit) {
         if (unit.getPlayer() == this.self) {
             xcs.reward(Rewards.DESTROYED_ALLY);
-            LOGGER.warning("Allied Unit was Destroyed " + unit.getType() + ": " + unit);
+            LOGGER.info("Allied Unit was Destroyed " + unit.getType() + ": " + unit);
         } else {
             xcs.reward(Rewards.DESTROY_ENEMY);
             LOGGER.warning("Destroyed Enemy Unit " + unit.getType());
@@ -161,10 +161,14 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
         xcs.finish();
         LOGGER.warning("Game Ended did we win? " + winner + " Number of Classifiers: " + xcs.getPopSize()
                 + " Number of games won: " + wonGames + " Number of games lost: " + lostGames + " avg. Fitness: "
-                + xcs.getAverageFitness());
+                + xcs.getAverageFitness() + "\n"
+                + "Covering: " + xcs.coveredClassifiers + " GA: " + xcs.GARuns + " deleted Classifiers: " + xcs.deletedClassifiers
+                + " Steps: " + xcs.steps + " Explorations: " + xcs.explorations + " Exp/Steps: " + (double) xcs.explorations / xcs.steps
+                + " Timestep: " + xcs.getTimestep());
         if (saveGame) {
             xcs.saveXCS(XCS.fileName);
         }
+        xcs.cleanUp();
     }
 
     @Override
@@ -201,7 +205,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     public void onUnitHide(Unit unit) {
         if (unit.getPlayer() != this.self) {
             xcs.reward(Rewards.HIDE_ENEMY);
-            LOGGER.warning("Loosing sight to unit");
+            LOGGER.info("Loosing sight to unit");
         }
     }
 
