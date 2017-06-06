@@ -169,7 +169,7 @@ public class XCS {
 
     }
 
-    public void finnish() {
+    public void finish() {
         // Method for last Evaluation when game finished
         synchronized (actionSetsLock) {
             actionSets.add(new AbstractMap.SimpleEntry<HashSet, Double>(new HashSet(), 0.)); // add empty HashSet to as there is no Action Set in this last Step

@@ -158,7 +158,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
             //xcs.rewardAllActionSets(Rewards.LOSE_GAME_STEP, true);
             lostGames++;
         }
-        xcs.finnish();
+        xcs.finish();
         LOGGER.warning("Game Ended did we win? " + winner + " Number of Classifiers: " + xcs.getPopSize()
                 + " Number of games won: " + wonGames + " Number of games lost: " + lostGames + " avg. Fitness: "
                 + xcs.getAverageFitness());
