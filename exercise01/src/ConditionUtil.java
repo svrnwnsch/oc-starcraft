@@ -268,7 +268,7 @@ public class ConditionUtil {
 
         if (i != sizeCondtion) {
             System.out.println("The size of Conditions should be: " + sizeCondtion +
-                    " But we only counted: " + i);
+                    " But we only counted: " + i + " in crossover");
             System.exit(-2);
         }
 
@@ -289,9 +289,262 @@ public class ConditionUtil {
 
     }
 
+    private static double getMutationChange() {
+        return RANDOM.nextDouble() * 0.2 - 0.1; // return value in [-0.1, 0.1]
+    }
+
+    private static double getMutatedValue(double oldValue) {
+        double change = getMutationChange();
+        if (oldValue + change <= 0) {
+            // if either interval or center gets smaller 0 then just half it
+            oldValue = oldValue / 2;
+        } else {
+            oldValue += change;
+        }
+        return oldValue;
+    }
+
     public static void applyMutation(Condition condition) {
         int sizeCondtion = 2 * (Situation.LENGTH + (Situation.closestAlliesArraySize +
                 Situation.closestEnemiesArraySize) * ReducedUnit.LENGTH);
+
+        int i = 0;
+        if (RANDOM.nextDouble() < XCS.mu) {
+            condition.situation.setUnitHitPoints(getMutatedValue(condition.situation.getUnitHitpoints()));
+        }
+        i++;
+        if (RANDOM.nextDouble() < XCS.mu) {
+            condition.unitHitPointsInterval = getMutatedValue(condition.unitHitPointsInterval);
+        }
+        i++;
+        if (RANDOM.nextDouble() < XCS.mu) {
+            condition.situation.setUnitPosX(getMutatedValue(condition.situation.getUnitPosX()));
+
+        }
+        i++;
+        if (RANDOM.nextDouble() < XCS.mu) {
+
+            condition.unitPosXInterval = getMutatedValue(condition.unitPosXInterval);
+
+        }
+        i++;
+        if (RANDOM.nextDouble() < XCS.mu) {
+
+            condition.situation.setUnitPosY(getMutatedValue(condition.situation.getUnitPosY()));
+
+        }
+        i++;
+        if (RANDOM.nextDouble() < XCS.mu) {
+
+            condition.unitPosYInterval = getMutatedValue(condition.unitPosYInterval);
+
+        }
+        i++;
+        if (RANDOM.nextDouble() < XCS.mu) {
+
+            condition.situation.setUnitGroundCooldown(getMutatedValue(condition.situation.getUnitGroundCooldown()));
+
+        }
+        i++;
+        if (RANDOM.nextDouble() < XCS.mu) {
+
+            condition.unitGroundCooldownInterval = getMutatedValue(condition.unitGroundCooldownInterval);
+
+        }
+        i++;
+        if (RANDOM.nextDouble() < XCS.mu) {
+
+            condition.situation.setNumberAlliesOnMap(getMutatedValue(condition.situation.getNumberAlliesOnMap()));
+
+        }
+        i++;
+        if (RANDOM.nextDouble() < XCS.mu) {
+
+            condition.numberAlliesOnMapInterval = getMutatedValue(condition.numberAlliesOnMapInterval);
+
+        }
+        i++;
+        if (RANDOM.nextDouble() < XCS.mu) {
+
+            condition.situation.setNumberSightedEnemiesOnMap(getMutatedValue(condition.situation.getNumberSightedEnemiesOnMap()));
+
+        }
+        i++;
+        if (RANDOM.nextDouble() < XCS.mu) {
+
+            condition.numberSightedEnemiesOnMapInterval = getMutatedValue(condition.numberSightedEnemiesOnMapInterval);
+
+        }
+        i++;
+        if (RANDOM.nextDouble() < XCS.mu) {
+
+            condition.situation.setKillCountAllies(getMutatedValue(condition.situation.getKillCountAllies()));
+
+        }
+        i++;
+        if (RANDOM.nextDouble() < XCS.mu) {
+
+            condition.killCountAlliesInterval = getMutatedValue(condition.killCountAlliesInterval);
+
+        }
+        i++;
+        for (int j = 0; j < condition.situation.getClosestAllies().size(); j++) {
+            ReducedUnit rUnit1 = condition.situation.getClosestAllies().get(j);
+            ReducedUnitInterval rUnitInterval1 = condition.closestAlliesInterval.get(j);
+            if (RANDOM.nextDouble() < XCS.mu) {
+                rUnit1.normedDistance = getMutatedValue(rUnit1.normedDistance);
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnitInterval1.normedDistanceInterval = getMutatedValue(rUnitInterval1.normedDistanceInterval);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnit1.normedAngle = getMutatedValue(rUnit1.normedAngle);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnitInterval1.normedAngleInterval = getMutatedValue(rUnitInterval1.normedAngleInterval);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnit1.normedHitPoints = getMutatedValue(rUnit1.normedHitPoints);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnitInterval1.normedHitPointsInterval = getMutatedValue(rUnitInterval1.normedHitPointsInterval);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnit1.unitType = getMutatedValue(rUnit1.unitType);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnitInterval1.unitTypeInterval = getMutatedValue(rUnitInterval1.unitTypeInterval);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnit1.velocityX = getMutatedValue(rUnit1.velocityX);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnitInterval1.velocityXInterval = getMutatedValue(rUnitInterval1.velocityXInterval);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnit1.velocityY = getMutatedValue(rUnit1.velocityY);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnitInterval1.velocityYInterval = getMutatedValue(rUnitInterval1.velocityYInterval);
+
+            }
+            i++;
+        }
+
+        for (int j = 0; j < condition.situation.getClosestEnemies().size(); j++) {
+            ReducedUnit rUnit1 = condition.situation.getClosestEnemies().get(j);
+            ReducedUnitInterval rUnitInterval1 = condition.closestEnemiesInterval.get(j);
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnit1.normedDistance = getMutatedValue(rUnit1.normedDistance);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnitInterval1.normedDistanceInterval = getMutatedValue(rUnitInterval1.normedDistanceInterval);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnit1.normedAngle = getMutatedValue(rUnit1.normedAngle);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnitInterval1.normedAngleInterval = getMutatedValue(rUnitInterval1.normedAngleInterval);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnit1.normedHitPoints = getMutatedValue(rUnit1.normedHitPoints);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnitInterval1.normedHitPointsInterval = getMutatedValue(rUnitInterval1.normedHitPointsInterval);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnit1.unitType = getMutatedValue(rUnit1.unitType);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnitInterval1.unitTypeInterval = getMutatedValue(rUnitInterval1.unitTypeInterval);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnit1.velocityX = getMutatedValue(rUnit1.velocityX);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnitInterval1.velocityXInterval = getMutatedValue(rUnitInterval1.velocityXInterval);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnit1.velocityY = getMutatedValue(rUnit1.velocityY);
+
+            }
+            i++;
+            if (RANDOM.nextDouble() < XCS.mu) {
+
+                rUnitInterval1.velocityYInterval = getMutatedValue(rUnitInterval1.velocityYInterval);
+
+            }
+            i++;
+        }
+
+        if (i != sizeCondtion) {
+            System.out.println("The size of Conditions should be: " + sizeCondtion +
+                    " But we only counted: " + i + " in mutation");
+            System.exit(-3);
+        }
     }
 
 }

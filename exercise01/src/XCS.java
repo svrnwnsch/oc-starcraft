@@ -47,7 +47,7 @@ public class XCS {
     private double gamma = 0.71; // discount factor
     private int thetaGA = 40;
     private double chi = 1; // crossover probabilities 0.5-1
-    private double mu = 0.02; // mutation probability
+    public static double mu = 0.02; // mutation probability
     public static final double thetaDel = 20; // deletion threshold
     public static final double delta = 0.1;
     private double thetaSub = 20; // subsumption threshold
@@ -199,12 +199,13 @@ public class XCS {
             for (Classifier matchClass : matchSet) {
                 actionsId.add(matchClass.getActionId());
             }
+            // Covering takes place here
             if (actionsId.size() < thetaMNA) {
                 TreeSet<Integer> missingActionIds = new TreeSet<>(actionDic.keySet());
                 missingActionIds.removeAll(actionsId);
                 for (int i : missingActionIds) {
                     Classifier newClassifier = new Classifier(currentSituation, timestep);
-                    LOGGER.info(population.size() + ": Created New Classifier with Action Id: " + i);
+                    LOGGER.warning("Covering: Created New Classifier with Action Id: " + i);
                     newClassifier.setActionId(i);
                     population.add(newClassifier);
                 }
@@ -476,6 +477,12 @@ public class XCS {
 
     private void applyMutation(Classifier child) {
         //TODO: implement method
+        // mutate classifiers
+        ConditionUtil.applyMutation(child.getCondition());
+        // mutate ActionId
+        if (random.nextDouble() < mu) {
+            child.setActionId((int) actionDic.keySet().toArray()[random.nextInt(actionDic.keySet().size())]);
+        }
     }
 
     private boolean doesSubsume(Classifier parent, Classifier child) {
