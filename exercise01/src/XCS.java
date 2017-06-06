@@ -39,7 +39,7 @@ public class XCS {
 
     // XCS parameters taken from "An Algorithmic Description of XCS"
 
-    private int N = 10000;  // population Size  untested
+    private int N = 20000;  // population Size  untested
     private double beta = 0.1;  // learning rate
     private double alpha = 0.1;
     private double epsilon0 = 1; // should be 1% of maximum predicted reward
@@ -58,6 +58,7 @@ public class XCS {
     private int thetaMNA; // number of all possible Action
     private static final boolean DO_GA_SUBSUMPTION = true;
 
+    private double predExpo = 2; // The Exponent for positive predictions for wheel selection.
     private int timestep = 0;
     private static int MULTI_STEP_REWARD_LENGTH = 30;
 
@@ -249,7 +250,7 @@ public class XCS {
         predictionSet.values().removeIf(Objects::isNull); // remove all Actions where it is null
         int selectedActionId = -1;
         // reduce over time the expolration to 1% of original Expolration
-        if (random.nextDouble() < (pExplor - 0.99 * pExplor * Math.exp(-50000. / timestep))) {
+        if (random.nextDouble() < (pExplor - 0.99 * pExplor * Math.exp(-100000. / timestep))) {
             // do exploration
             List<Integer> aIds = new ArrayList<Integer>(predictionSet.keySet());
             selectedActionId = aIds.get(random.nextInt(aIds.size()));
@@ -262,7 +263,7 @@ public class XCS {
                 double pred = predictionSet.get(aId);
                 LOGGER.config("aId: " + aId + " pred: " + pred);
                 if (pred > 0) {
-                    sumPositvPrediction += pred;
+                    sumPositvPrediction += Math.pow(pred, predExpo);
                 }
                 if (pred > bestPrediction) {
                     // select action id with best prediction
@@ -278,7 +279,7 @@ public class XCS {
                 for (int aId : predictionSet.keySet()) {
                     double pred = predictionSet.get(aId);
                     if (pred > 0) {
-                        predSum += pred;
+                        predSum += Math.pow(pred, predExpo);
                     }
                     if (predSum >= threshold) {
                         return aId;
