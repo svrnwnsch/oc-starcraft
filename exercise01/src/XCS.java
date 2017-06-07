@@ -19,7 +19,7 @@ public class XCS {
     private Random random = new Random();
     private final static Logger LOGGER = Logger.getLogger(VultureAI.class.getName());
     public static String fileDirectory = "data";
-    public static String fileName = fileDirectory + "\\xcs3.ser";
+    public static String fileName = fileDirectory + "\\xcs4.ser";
 
     private HashSet<Classifier> population; // population of all classifiers in XCS
     private HashSet<Classifier> matchSet; // match set for current environment
@@ -39,11 +39,11 @@ public class XCS {
 
     // XCS parameters taken from "An Algorithmic Description of XCS"
 
-    private int N = 20000;  // population Size  untested
+    private int N = 40000;  // population Size  untested
     private double beta = 0.1;  // learning rate
     private double alpha = 0.1;
-    private double epsilon0 = 1; // should be 1% of maximum predicted reward
-    private double nu = 5; // power parameter
+    private double epsilon0 = 5; // should be 1% of maximum predicted reward
+    private double nu = 3; // power parameter
     private double gamma = 0.71; // discount factor
     private int thetaGA = 40;
     private double chi = 1; // crossover probabilities 0.5-1
@@ -51,9 +51,9 @@ public class XCS {
     public static final double thetaDel = 50; // deletion threshold
     public static final double delta = 0.1;
     private double thetaSub = 20; // subsumption threshold
-    public static double pInit = 0; // Predicted reward init
-    public static double epsilonInit = 0; // prediction error init
-    public static double FInit = 0; // Fitness init
+    public static double pInit = 5; // Predicted reward init
+    public static double epsilonInit = 0.1; // prediction error init
+    public static double FInit = 0.5; // Fitness init
     private double pExplor = 0.4; // exploration probability
     private int thetaMNA; // number of all possible Action
     private static final boolean DO_GA_SUBSUMPTION = true;
@@ -573,6 +573,20 @@ public class XCS {
         GARuns = 0;
         explorations = 0;
         steps = 0;
+    }
+
+    public void printFitness(int buckets) {
+        int[] list = new int[buckets + 1];
+        for (int i = 0; i < buckets + 1; i++) {
+            list[i] = 0;
+        }
+        for (Classifier cl : population) {
+            list[(int) (cl.getFitness() * buckets)] += 1;
+        }
+        System.out.print("Fitnessbuckets: ");
+        for (int i = 0; i < buckets + 1; i++) {
+            System.out.print((float) i / buckets + ": " + list[i] + ", ");
+        }
     }
 
     public void printClassifiers() {
