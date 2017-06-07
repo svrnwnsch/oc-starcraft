@@ -13,8 +13,8 @@ public class Rewards {
 
     // Negative Rewards
     public static final double HOLD = -1;
-    public static final int ILLEGAL_MOVE = -1;
-    public static final int HIDE_ENEMY = -25;
+    public static final int ILLEGAL_MOVE = -2;
+    public static final int HIDE_ENEMY = -5;
     public static final int CANNOT_ATTACK = -5;
     public static final int DESTROYED_ALLY = 0; //-10;
     public static final int LOSE_GAME = -20;
@@ -23,8 +23,8 @@ public class Rewards {
 
 
     // Multiplier used to config rewards
-    public static final int ATTACK_REWARD_MULTIPLIER = 3;
-    public static final double TAKE_DAMAGE_REWARD_MULTIPLIER = 1.5;
+    public static final int ATTACK_REWARD_MULTIPLIER = 4;
+    public static final double TAKE_DAMAGE_REWARD_MULTIPLIER = 1;
 
 
 }
