@@ -129,4 +129,16 @@ public class Condition implements java.io.Serializable {
         return (conditionValue - conditionInterval <= situationValue && conditionValue + conditionInterval >= situationValue);
     }
 
+     public Situation getSituation(){return situation}
+     public double getUnitHitPointsInterval(){return unitHitPointsInterval}
+     public double getUnitPosXInterval(){return unitPosXInterval}
+     public double getUnitPosYInterval(){return unitPosYInterval}
+     public double getUnitGroundCooldownInterval(){return unitGroundCooldownInterval}
+     public double getNumberAlliesOnMapInterval(){return numberAlliesOnMapInterval}
+     public double getNumberEnemiesOnMapInterval(){return numberEnemiesOnMapInterval}
+     public double getNumberSightedEnemiesOnMapInterval(){return numberSightedEnemiesOnMapInterval}
+     public double getKillCountEnemiesInterval(){return killCountEnemiesInterval}
+     public double getKillCountAlliesInterval(){return killCountAlliesInterval}
+     public ArrayList<ReducedUnitInterval> getClosestEnemiesInterval(){return closestEnemiesInterval}
+     public ArrayList<ReducedUnitInterval> getClosestAlliesInterval(){return closestAlliesInterval}
 }
