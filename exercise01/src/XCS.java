@@ -39,10 +39,10 @@ public class XCS {
 
     // XCS parameters taken from "An Algorithmic Description of XCS"
 
-    private int N = 20000;  // population Size  untested
+    private int N = 400;  // population Size  untested
     private double beta = 0.1;  // learning rate
     private double alpha = 0.1;
-    private double epsilon0 = 1; // should be 1% of maximum predicted reward
+    private double epsilon0 = 10; // should be 1% of maximum predicted reward
     private double nu = 5; // power parameter
     private double gamma = 0.71; // discount factor
     private int thetaGA = 40;
@@ -50,7 +50,7 @@ public class XCS {
     public static double mu = 0.02; // mutation probability
     public static final double thetaDel = 50; // deletion threshold
     public static final double delta = 0.1;
-    private double thetaSub = 20; // subsumption threshold
+    private double thetaSub = 300; // subsumption threshold
     public static double pInit = 0; // Predicted reward init
     public static double epsilonInit = 0; // prediction error init
     public static double FInit = 0; // Fitness init
@@ -555,9 +555,13 @@ public class XCS {
         return result;
     }
 
-    public boolean matchConditionVariable(double  parentClassifierValue, double parentClassifierInterval, double childClassifierValue, double childClassifierInterval){
-
-        return (parentClassifierValue - parentClassifierInterval <= childClassifierValue - childClassifierInterval && parentClassifierValue + parentClassifierInterval >= childClassifierValue + childClassifierInterval);
+    //matches the conditions to each other. tests if the values are larger than 1 or smaller than -1. If this applies for both, the parent and the child and the other end of the interval fits, it returns a true. otherwise it is checked in detail if the child fits in the parent.
+    public boolean matchConditionVariable(double  parentClassifierValue, double parentClassifierInterval, double childClassifierValue, double childClassifierInterval) {
+        if ((((parentClassifierValue - parentClassifierInterval) <= (-1)) && ((childClassifierValue - childClassifierInterval) <= (-1)) && (parentClassifierValue + parentClassifierInterval >= childClassifierValue + childClassifierInterval)) || (((parentClassifierValue + parentClassifierInterval) >= 1) && ((childClassifierValue + childClassifierInterval) >= (1)) && (parentClassifierValue - parentClassifierInterval <= childClassifierValue - childClassifierInterval)) || (((parentClassifierValue - parentClassifierInterval) <= (-1)) && ((childClassifierValue - childClassifierInterval) <= (-1)) && ((parentClassifierValue + parentClassifierInterval) >= 1) && ((childClassifierValue + childClassifierInterval) >= (1)))) {
+            return true;
+        } else {
+            return (parentClassifierValue - parentClassifierInterval <= childClassifierValue - childClassifierInterval && parentClassifierValue + parentClassifierInterval >= childClassifierValue + childClassifierInterval);
+        }
     }
 
     public int getPopSize() {
