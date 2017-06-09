@@ -165,6 +165,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
                 + "Covering: " + xcs.coveredClassifiers + " GA: " + xcs.GARuns + " deleted Classifiers: " + xcs.deletedClassifiers
                 + " Steps: " + xcs.steps + " Explorations: " + xcs.explorations + " Exp/Steps: " + (double) xcs.explorations / xcs.steps
                 + " Timestep: " + xcs.getTimestep());
+        xcs.printFitness(10);
         if (saveGame) {
             xcs.saveXCS(XCS.fileName);
         }
