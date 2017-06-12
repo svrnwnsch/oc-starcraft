@@ -495,9 +495,9 @@ public class XCS {
 
 
     private boolean doesSubsume(Classifier parent, Classifier child) {
-        if (parent.getActionSetSize() == child.getActionSetSize() && parent.getActionId() == child.getActionId()){
-            if(couldSubsume(parent)){
-                if(isMoreGeneral(parent, child)) {
+        if (parent.getActionSetSize() == child.getActionSetSize() && parent.getActionId() == child.getActionId()) {
+            if (couldSubsume(parent)) {
+                if (isMoreGeneral(parent, child)) {
                     return true;
                 }
             }
@@ -508,11 +508,11 @@ public class XCS {
 
     //checks if the classifier is experienced and accurate enough to subsume another classifier
     private boolean couldSubsume(Classifier parent) {
-            if(parent.getExp() > thetaSub){
-                if(parent.getPredictionError() < epsilon0){
-                    return true;
-                }
+        if (parent.getExp() > thetaSub) {
+            if (parent.getPredictionError() < epsilon0) {
+                return true;
             }
+        }
         return false;
     }
 
@@ -522,41 +522,42 @@ public class XCS {
         return matchCondition(parent.getCondition(), child.getCondition());
     }
 
-    public boolean compareInterval(double parentInterval, double childInterval){
+    public boolean compareInterval(double parentInterval, double childInterval) {
         return (parentInterval < childInterval);
 
     }
-    public boolean matchCondition(Condition parent, Condition child){
+
+    public boolean matchCondition(Condition parent, Condition child) {
         Situation parentSituation = parent.getSituation();
         Situation childSituation = child.getSituation();
-        boolean result = (matchConditionVariable(parentSituation.getUnitHitpoints(), parent.getUnitHitPointsInterval(),childSituation.getUnitHitpoints(), child.getUnitHitPointsInterval()) ||
-                matchConditionVariable(parentSituation.getUnitPosX(),parent.getUnitPosXInterval(), childSituation.getUnitPosX(), child.getUnitPosXInterval()) || 
-                matchConditionVariable(parentSituation.getUnitPosY(), parent.getUnitPosYInterval(), childSituation.getUnitPosY(), child.getUnitPosYInterval()) || 
+        boolean result = (matchConditionVariable(parentSituation.getUnitHitpoints(), parent.getUnitHitPointsInterval(), childSituation.getUnitHitpoints(), child.getUnitHitPointsInterval()) ||
+                matchConditionVariable(parentSituation.getUnitPosX(), parent.getUnitPosXInterval(), childSituation.getUnitPosX(), child.getUnitPosXInterval()) ||
+                matchConditionVariable(parentSituation.getUnitPosY(), parent.getUnitPosYInterval(), childSituation.getUnitPosY(), child.getUnitPosYInterval()) ||
                 matchConditionVariable(parentSituation.getUnitGroundCooldown(), parent.getUnitGroundCooldownInterval(), childSituation.getUnitGroundCooldown(), child.getUnitGroundCooldownInterval()) ||
-                matchConditionVariable(parentSituation.getNumberAlliesOnMap(),parent.getNumberAlliesOnMapInterval(),childSituation.getNumberAlliesOnMap(),child.getNumberAlliesOnMapInterval()) ||
-                matchConditionVariable(parentSituation.getNumberSightedEnemiesOnMap(),parent.getNumberSightedEnemiesOnMapInterval(),childSituation.getNumberSightedEnemiesOnMap(),child.getNumberSightedEnemiesOnMapInterval()) ||
-                matchConditionVariable(parentSituation.getKillCountAllies(),parent.getKillCountAlliesInterval(),childSituation.getKillCountAllies(),child.getKillCountAlliesInterval()));
-        for(int i=0; i<parentSituation.getClosestEnemies().size(); i++){
-            result = result || (matchConditionVariable(parentSituation.getClosestEnemies().get(i).normedDistance,parent.getClosestEnemiesInterval().get(i).normedDistanceInterval,childSituation.getClosestEnemies().get(i).normedDistance,child.getClosestEnemiesInterval().get(i).normedDistanceInterval) || 
-                    matchConditionVariable(parentSituation.getClosestEnemies().get(i).normedAngle,parent.getClosestEnemiesInterval().get(i).normedAngleInterval,childSituation.getClosestEnemies().get(i).normedAngle,child.getClosestEnemiesInterval().get(i).normedAngleInterval) ||
-                    matchConditionVariable(parentSituation.getClosestEnemies().get(i).normedHitPoints,parent.getClosestEnemiesInterval().get(i).normedHitPointsInterval,childSituation.getClosestEnemies().get(i).normedHitPoints,child.getClosestEnemiesInterval().get(i).normedHitPointsInterval) || 
-                    matchConditionVariable(parentSituation.getClosestEnemies().get(i).unitType,parent.getClosestEnemiesInterval().get(i).unitTypeInterval,childSituation.getClosestEnemies().get(i).unitType,child.getClosestEnemiesInterval().get(i).unitTypeInterval) || 
-                    matchConditionVariable(parentSituation.getClosestEnemies().get(i).velocityX,parent.getClosestEnemiesInterval().get(i).velocityXInterval,childSituation.getClosestEnemies().get(i).velocityX,child.getClosestEnemiesInterval().get(i).velocityXInterval) || 
-                    matchConditionVariable(parentSituation.getClosestEnemies().get(i).velocityY,parent.getClosestEnemiesInterval().get(i).velocityYInterval,childSituation.getClosestEnemies().get(i).velocityY,child.getClosestEnemiesInterval().get(i).velocityYInterval));
+                matchConditionVariable(parentSituation.getNumberAlliesOnMap(), parent.getNumberAlliesOnMapInterval(), childSituation.getNumberAlliesOnMap(), child.getNumberAlliesOnMapInterval()) ||
+                matchConditionVariable(parentSituation.getNumberSightedEnemiesOnMap(), parent.getNumberSightedEnemiesOnMapInterval(), childSituation.getNumberSightedEnemiesOnMap(), child.getNumberSightedEnemiesOnMapInterval()) ||
+                matchConditionVariable(parentSituation.getKillCountAllies(), parent.getKillCountAlliesInterval(), childSituation.getKillCountAllies(), child.getKillCountAlliesInterval()));
+        for (int i = 0; i < parentSituation.getClosestEnemies().size(); i++) {
+            result = result || (matchConditionVariable(parentSituation.getClosestEnemies().get(i).normedDistance, parent.getClosestEnemiesInterval().get(i).normedDistanceInterval, childSituation.getClosestEnemies().get(i).normedDistance, child.getClosestEnemiesInterval().get(i).normedDistanceInterval) ||
+                    matchConditionVariable(parentSituation.getClosestEnemies().get(i).normedAngle, parent.getClosestEnemiesInterval().get(i).normedAngleInterval, childSituation.getClosestEnemies().get(i).normedAngle, child.getClosestEnemiesInterval().get(i).normedAngleInterval) ||
+                    matchConditionVariable(parentSituation.getClosestEnemies().get(i).normedHitPoints, parent.getClosestEnemiesInterval().get(i).normedHitPointsInterval, childSituation.getClosestEnemies().get(i).normedHitPoints, child.getClosestEnemiesInterval().get(i).normedHitPointsInterval) ||
+                    matchConditionVariable(parentSituation.getClosestEnemies().get(i).unitType, parent.getClosestEnemiesInterval().get(i).unitTypeInterval, childSituation.getClosestEnemies().get(i).unitType, child.getClosestEnemiesInterval().get(i).unitTypeInterval) ||
+                    matchConditionVariable(parentSituation.getClosestEnemies().get(i).velocityX, parent.getClosestEnemiesInterval().get(i).velocityXInterval, childSituation.getClosestEnemies().get(i).velocityX, child.getClosestEnemiesInterval().get(i).velocityXInterval) ||
+                    matchConditionVariable(parentSituation.getClosestEnemies().get(i).velocityY, parent.getClosestEnemiesInterval().get(i).velocityYInterval, childSituation.getClosestEnemies().get(i).velocityY, child.getClosestEnemiesInterval().get(i).velocityYInterval));
         }
-        for(int i=0; i<parentSituation.getClosestAllies().size(); i++){
-            result = result || (matchConditionVariable(parentSituation.getClosestAllies().get(i).normedDistance,parent.getClosestAlliesInterval().get(i).normedDistanceInterval,childSituation.getClosestAllies().get(i).normedDistance,child.getClosestAlliesInterval().get(i).normedDistanceInterval) ||
-                    matchConditionVariable(parentSituation.getClosestAllies().get(i).normedAngle,parent.getClosestAlliesInterval().get(i).normedAngleInterval,childSituation.getClosestAllies().get(i).normedAngle,child.getClosestAlliesInterval().get(i).normedAngleInterval) ||
-                    matchConditionVariable(parentSituation.getClosestAllies().get(i).normedHitPoints,parent.getClosestAlliesInterval().get(i).normedHitPointsInterval,childSituation.getClosestAllies().get(i).normedHitPoints,child.getClosestAlliesInterval().get(i).normedHitPointsInterval) ||
-                    matchConditionVariable(parentSituation.getClosestAllies().get(i).unitType,parent.getClosestAlliesInterval().get(i).unitTypeInterval,childSituation.getClosestAllies().get(i).unitType,child.getClosestAlliesInterval().get(i).unitTypeInterval) ||
-                    matchConditionVariable(parentSituation.getClosestAllies().get(i).velocityX,parent.getClosestAlliesInterval().get(i).velocityXInterval,childSituation.getClosestAllies().get(i).velocityX,child.getClosestAlliesInterval().get(i).velocityXInterval) ||
-                    matchConditionVariable(parentSituation.getClosestAllies().get(i).velocityY,parent.getClosestAlliesInterval().get(i).velocityYInterval,childSituation.getClosestAllies().get(i).velocityY,child.getClosestAlliesInterval().get(i).velocityYInterval));
+        for (int i = 0; i < parentSituation.getClosestAllies().size(); i++) {
+            result = result || (matchConditionVariable(parentSituation.getClosestAllies().get(i).normedDistance, parent.getClosestAlliesInterval().get(i).normedDistanceInterval, childSituation.getClosestAllies().get(i).normedDistance, child.getClosestAlliesInterval().get(i).normedDistanceInterval) ||
+                    matchConditionVariable(parentSituation.getClosestAllies().get(i).normedAngle, parent.getClosestAlliesInterval().get(i).normedAngleInterval, childSituation.getClosestAllies().get(i).normedAngle, child.getClosestAlliesInterval().get(i).normedAngleInterval) ||
+                    matchConditionVariable(parentSituation.getClosestAllies().get(i).normedHitPoints, parent.getClosestAlliesInterval().get(i).normedHitPointsInterval, childSituation.getClosestAllies().get(i).normedHitPoints, child.getClosestAlliesInterval().get(i).normedHitPointsInterval) ||
+                    matchConditionVariable(parentSituation.getClosestAllies().get(i).unitType, parent.getClosestAlliesInterval().get(i).unitTypeInterval, childSituation.getClosestAllies().get(i).unitType, child.getClosestAlliesInterval().get(i).unitTypeInterval) ||
+                    matchConditionVariable(parentSituation.getClosestAllies().get(i).velocityX, parent.getClosestAlliesInterval().get(i).velocityXInterval, childSituation.getClosestAllies().get(i).velocityX, child.getClosestAlliesInterval().get(i).velocityXInterval) ||
+                    matchConditionVariable(parentSituation.getClosestAllies().get(i).velocityY, parent.getClosestAlliesInterval().get(i).velocityYInterval, childSituation.getClosestAllies().get(i).velocityY, child.getClosestAlliesInterval().get(i).velocityYInterval));
         }
         return result;
     }
 
     //matches the conditions to each other. tests if the values are larger than 1 or smaller than -1. If this applies for both, the parent and the child and the other end of the interval fits, it returns a true. otherwise it is checked in detail if the child fits in the parent.
-    public boolean matchConditionVariable(double  parentClassifierValue, double parentClassifierInterval, double childClassifierValue, double childClassifierInterval) {
+    public boolean matchConditionVariable(double parentClassifierValue, double parentClassifierInterval, double childClassifierValue, double childClassifierInterval) {
         if ((((parentClassifierValue - parentClassifierInterval) <= (-1)) && ((childClassifierValue - childClassifierInterval) <= (-1)) && (parentClassifierValue + parentClassifierInterval >= childClassifierValue + childClassifierInterval)) || (((parentClassifierValue + parentClassifierInterval) >= 1) && ((childClassifierValue + childClassifierInterval) >= (1)) && (parentClassifierValue - parentClassifierInterval <= childClassifierValue - childClassifierInterval)) || (((parentClassifierValue - parentClassifierInterval) <= (-1)) && ((childClassifierValue - childClassifierInterval) <= (-1)) && ((parentClassifierValue + parentClassifierInterval) >= 1) && ((childClassifierValue + childClassifierInterval) >= (1)))) {
             return true;
         } else {
@@ -644,6 +645,21 @@ public class XCS {
     public void printClassifiers() {
         for (Classifier cl : population) {
             cl.printClassifier();
+        }
+    }
+
+
+    public void printFitness(int buckets) {
+        int[] list = new int[buckets + 1];
+        for (int i = 0; i < buckets + 1; i++) {
+            list[i] = 0;
+        }
+        for (Classifier cl : population) {
+            list[(int) (cl.getFitness() * buckets)] += 1;
+        }
+        System.out.print("Fitnessbuckets: ");
+        for (int i = 0; i < buckets + 1; i++) {
+            System.out.print((float) i / buckets + ": " + list[i] + ", ");
         }
     }
 }
